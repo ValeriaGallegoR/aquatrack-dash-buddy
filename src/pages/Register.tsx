@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import { registerSchema, registerUser } from '@/lib/auth';
-import { Droplets, Eye, EyeOff } from 'lucide-react';
+import { Droplets, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
