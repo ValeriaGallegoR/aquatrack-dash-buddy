@@ -14,6 +14,7 @@ import { Droplets, ArrowLeft, CheckCircle } from 'lucide-react';
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPassword() {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
