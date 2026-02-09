@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -14,6 +14,7 @@ import { Droplets, ArrowLeft, CheckCircle } from 'lucide-react';
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPassword() {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -44,13 +45,13 @@ export default function ForgotPassword() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-secondary via-background to-secondary/50 p-4">
       <div className="flex w-full max-w-md items-start gap-3">
-        <Link
-          to="/"
+        <button
+          onClick={() => navigate(-1)}
           className="mt-6 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border bg-background text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-foreground"
-          aria-label="Back to home"
+          aria-label="Go back"
         >
           <ArrowLeft className="h-4 w-4" />
-        </Link>
+        </button>
       <Card className="w-full">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full water-gradient">
