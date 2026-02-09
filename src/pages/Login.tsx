@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from '@/hooks/use-toast';
 import { loginSchema, loginUser } from '@/lib/auth';
 import { useAuth } from '@/contexts/AuthContext';
-import { Droplets, Eye, EyeOff } from 'lucide-react';
+import { Droplets, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 type LoginFormData = z.infer<typeof loginSchema>;
 

@@ -136,6 +136,7 @@ export default function Register() {
           </CardFooter>
         </form>
       </Card>
+      </div>
     </div>
   );
 }
