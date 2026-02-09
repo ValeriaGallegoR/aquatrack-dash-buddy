@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import { registerSchema, registerUser } from '@/lib/auth';
-import { Droplets, Eye, EyeOff } from 'lucide-react';
+import { Droplets, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
@@ -53,7 +53,15 @@ export default function Register() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-secondary via-background to-secondary/50 p-4">
-      <Card className="w-full max-w-md">
+      <div className="flex w-full max-w-md items-start gap-3">
+        <Link
+          to="/"
+          className="mt-6 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border bg-background text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-foreground"
+          aria-label="Back to home"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Link>
+      <Card className="w-full">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full water-gradient">
             <Droplets className="h-6 w-6 text-primary-foreground" />
@@ -128,6 +136,7 @@ export default function Register() {
           </CardFooter>
         </form>
       </Card>
+      </div>
     </div>
   );
 }
