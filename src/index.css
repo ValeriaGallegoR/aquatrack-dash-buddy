@@ -114,4 +114,13 @@
   .water-gradient {
     background: linear-gradient(135deg, hsl(var(--water-gradient-start)), hsl(var(--water-gradient-end)));
   }
+
+  .hover-lift {
+    @apply transition-all duration-300;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px hsl(var(--primary) / 0.15);
+  }
 }
