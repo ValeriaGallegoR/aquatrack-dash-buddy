@@ -127,3 +127,34 @@
       0 2px 8px hsl(var(--primary) / 0.08);
   }
 }
+
+@keyframes water-blob-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(5%, 8%) scale(1.05); }
+  66% { transform: translate(-3%, 4%) scale(0.97); }
+}
+@keyframes water-blob-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-6%, -4%) scale(0.95); }
+  66% { transform: translate(4%, -7%) scale(1.04); }
+}
+@keyframes water-blob-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-8%, 6%) scale(1.06); }
+}
+@keyframes wave-drift-1 {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-2%); }
+}
+@keyframes wave-drift-2 {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(2%); }
+}
+
+@layer utilities {
+  .animate-water-blob-1 { animation: water-blob-1 20s ease-in-out infinite; }
+  .animate-water-blob-2 { animation: water-blob-2 25s ease-in-out infinite; }
+  .animate-water-blob-3 { animation: water-blob-3 18s ease-in-out infinite; }
+  .animate-wave-1 { animation: wave-drift-1 8s ease-in-out infinite; }
+  .animate-wave-2 { animation: wave-drift-2 10s ease-in-out infinite; }
+}
