@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Droplets, TrendingDown, BarChart3, Leaf, ExternalLink } from 'lucide-react';
+import WaterBackground from '@/components/WaterBackground';
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary via-background to-secondary/50">
+    <div className="min-h-screen relative">
       {/* Header */}
       <header className="container mx-auto px-4 py-6 flex items-center justify-between">
         <div className="flex items-center gap-2">
