@@ -1,27 +1,23 @@
 import { useMemo } from 'react';
-import { Header } from '@/components/Header';
-import { StatCard } from '@/components/StatCard';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { useAuth } from '@/contexts/AuthContext';
+import { Badge } from '@/components/ui/badge';
+import { StatCard } from '@/components/StatCard';
+import {
+  Droplets, ArrowLeft, BarChart3, TrendingDown, TrendingUp,
+  Calendar, AlertTriangle, Leaf, Target, Lightbulb, Bell,
+} from 'lucide-react';
 import { getWaterStats, formatLiters } from '@/lib/waterData';
 import {
-  Droplets, Calendar, TrendingUp, BarChart3, Leaf, Target,
-  AlertTriangle, Bell, Lightbulb,
-} from 'lucide-react';
-import {
-  ResponsiveContainer, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip,
-  BarChart, Bar,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, LineChart, Line, Area, AreaChart,
 } from 'recharts';
 
-export default function Dashboard() {
-  const { user } = useAuth();
+export default function ExploreFeatures() {
+  const navigate = useNavigate();
   const stats = useMemo(() => getWaterStats(), []);
-
-  const monthlyTrend = stats.dailyData.slice(-14).map((d) => ({
-    date: d.date.slice(5),
-    liters: d.liters,
-  }));
 
   const weeklyComparison = [
     { name: 'Mon', current: 290, previous: 320 },
@@ -33,6 +29,11 @@ export default function Dashboard() {
     { name: 'Sun', current: 330, previous: 360 },
   ];
 
+  const monthlyTrend = stats.dailyData.slice(-14).map((d) => ({
+    date: d.date.slice(5),
+    liters: d.liters,
+  }));
+
   const sustainabilityScore = 72;
 
   const alerts = [
@@ -41,18 +42,45 @@ export default function Dashboard() {
     { message: 'Monthly goal progress: 68% of target met', level: 'info' as const },
   ];
 
+  const tips = [
+    { emoji: '🚿', title: 'Shorter Showers', desc: 'Reducing by 2 min saves ~10L per shower' },
+    { emoji: '🌧️', title: 'Collect Rainwater', desc: 'Use rainwater for garden irrigation' },
+    { emoji: '🔧', title: 'Fix Leaks Promptly', desc: 'A dripping faucet wastes 20L/day' },
+    { emoji: '🧺', title: 'Full Loads Only', desc: 'Run appliances only when full' },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 font-bold text-xl">
+            <Droplets className="h-6 w-6 text-primary" />
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              AquaTrack
+            </span>
+          </Link>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs">Demo Mode</Badge>
+            <Button asChild size="sm" className="hover-lift">
+              <Link to="/register">Sign Up Free</Link>
+            </Button>
+          </div>
+        </div>
+      </header>
+
       <main className="container py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">
-            Welcome back, {user?.username}! 👋
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Here's an overview of your household water consumption
-          </p>
+        <div className="flex items-center gap-3 mb-8">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border bg-background shadow-sm hover-lift transition-all duration-300"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Explore AquaTrack</h1>
+            <p className="text-muted-foreground">Preview our features with sample data</p>
+          </div>
         </div>
 
         {/* Stat Cards */}
@@ -63,8 +91,8 @@ export default function Dashboard() {
           <StatCard title="This Month" value={formatLiters(stats.monthlyTotal)} description="Monthly consumption" icon={BarChart3} />
         </div>
 
-        {/* Charts */}
         <div className="grid gap-6 lg:grid-cols-2 mb-8">
+          {/* Usage Trend Chart */}
           <Card className="hover-lift transition-all duration-300">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
@@ -76,7 +104,7 @@ export default function Dashboard() {
               <ResponsiveContainer width="100%" height={240}>
                 <AreaChart data={monthlyTrend}>
                   <defs>
-                    <linearGradient id="dashWaterGrad" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(199, 89%, 48%)" stopOpacity={0.3} />
                       <stop offset="95%" stopColor="hsl(199, 89%, 48%)" stopOpacity={0} />
                     </linearGradient>
@@ -85,16 +113,17 @@ export default function Dashboard() {
                   <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                   <YAxis tick={{ fontSize: 12 }} />
                   <Tooltip />
-                  <Area type="monotone" dataKey="liters" stroke="hsl(199, 89%, 48%)" fill="url(#dashWaterGrad)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="liters" stroke="hsl(199, 89%, 48%)" fill="url(#waterGrad)" strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
 
+          {/* Weekly Comparison */}
           <Card className="hover-lift transition-all duration-300">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-accent" />
+                <TrendingDown className="h-5 w-5 text-accent" />
                 This Week vs Last Week
               </CardTitle>
             </CardHeader>
@@ -113,7 +142,6 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Bottom row */}
         <div className="grid gap-6 lg:grid-cols-3 mb-8">
           {/* Sustainability Score */}
           <Card className="hover-lift transition-all duration-300">
@@ -130,7 +158,7 @@ export default function Dashboard() {
               </div>
               <Progress value={sustainabilityScore} className="h-3" />
               <p className="text-sm text-muted-foreground">
-                You're using water more efficiently than 68% of similar households.
+                Good! You're using water more efficiently than 68% of similar households.
               </p>
             </CardContent>
           </Card>
@@ -193,21 +221,16 @@ export default function Dashboard() {
         </div>
 
         {/* Tips */}
-        <Card className="hover-lift transition-all duration-300">
+        <Card className="hover-lift transition-all duration-300 mb-8">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Lightbulb className="h-5 w-5 text-primary" />
-              Personalized Water-Saving Tips
+              Water-Saving Tips & Recommendations
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-2">
-              {[
-                { emoji: '🚿', title: 'Shorter Showers', desc: 'Reducing shower time by 2 minutes can save up to 10 liters of water' },
-                { emoji: '🪥', title: 'Turn Off While Brushing', desc: 'Save up to 6 liters per minute by turning off the tap while brushing teeth' },
-                { emoji: '🧺', title: 'Full Loads Only', desc: 'Run washing machines and dishwashers only with full loads' },
-                { emoji: '🔧', title: 'Fix Leaky Faucets', desc: 'A dripping faucet can waste up to 20 liters of water per day' },
-              ].map((tip, i) => (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {tips.map((tip, i) => (
                 <div key={i} className="flex items-start gap-3 p-3 rounded-lg border hover:border-primary/20 transition-all duration-300">
                   <div className="rounded-full bg-secondary p-2 text-lg">{tip.emoji}</div>
                   <div>
@@ -219,6 +242,15 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {/* CTA Banner */}
+        <div className="rounded-xl water-gradient p-8 text-center text-primary-foreground">
+          <h2 className="text-2xl font-bold mb-2">Ready to track your water?</h2>
+          <p className="mb-6 opacity-90">Create a free account to start monitoring your real consumption.</p>
+          <Button asChild size="lg" variant="secondary" className="hover-lift">
+            <Link to="/register">Create Free Account</Link>
+          </Button>
+        </div>
       </main>
     </div>
   );
