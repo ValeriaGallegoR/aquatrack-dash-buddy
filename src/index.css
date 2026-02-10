@@ -117,10 +117,13 @@
 
   .hover-lift {
     @apply transition-all duration-300;
+    transform: perspective(800px) translateY(0) rotateX(0deg);
   }
 
   .hover-lift:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px hsl(var(--primary) / 0.15);
+    transform: perspective(800px) translateY(-4px) rotateX(1.5deg);
+    box-shadow:
+      0 8px 24px hsl(var(--primary) / 0.12),
+      0 2px 8px hsl(var(--primary) / 0.08);
   }
 }
