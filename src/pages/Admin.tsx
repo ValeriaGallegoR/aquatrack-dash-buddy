@@ -122,6 +122,7 @@ export default function Admin() {
         password: formData.password,
         role: formData.role,
         isActive: true,
+        isVerified: true,
       });
       toast({
         title: result.success ? 'Success' : 'Error',
