@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -7,65 +7,79 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { toast } from '@/hooks/use-toast';
-import { registerSchema, registerUser, isPasswordStrong } from '@/lib/auth';
+import { resetPasswordSchema, resetPassword, isPasswordStrong } from '@/lib/auth';
 import { PasswordRequirements } from '@/components/PasswordRequirements';
 import { Droplets, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
-type RegisterFormData = z.infer<typeof registerSchema>;
+type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
-export default function Register() {
+export default function ResetPassword() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const email = (location.state as { email?: string })?.email || '';
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [otpValue, setOtpValue] = useState('');
 
   const {
     register,
     handleSubmit,
     watch,
-    formState: { errors, isValid },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+    setValue,
+    formState: { errors },
+  } = useForm<ResetPasswordFormData>({
+    resolver: zodResolver(resetPasswordSchema),
     mode: 'onChange',
+    defaultValues: { otp: '' },
   });
 
   const watchedPassword = watch('password', '');
   const watchedConfirmPassword = watch('confirmPassword', '');
-  const watchedUsername = watch('username', '');
-  const watchedEmail = watch('email', '');
 
-  const allFieldsFilled = watchedUsername.trim().length >= 3 && watchedEmail.includes('@') && isPasswordStrong(watchedPassword) && watchedPassword === watchedConfirmPassword && watchedConfirmPassword.length > 0;
+  const allValid = otpValue.length === 6 && isPasswordStrong(watchedPassword) && watchedPassword === watchedConfirmPassword && watchedConfirmPassword.length > 0;
 
-  const onSubmit = async (data: RegisterFormData) => {
+  const handleOtpChange = (value: string) => {
+    setOtpValue(value);
+    setValue('otp', value);
+  };
+
+  const onSubmit = async (data: ResetPasswordFormData) => {
+    if (!email) {
+      navigate('/forgot-password');
+      return;
+    }
     setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    const result = registerUser(data.username, data.email, data.password);
+    const result = resetPassword(email, data.otp, data.password);
 
     if (result.success) {
-      toast({
-        title: 'Account created!',
-        description: result.message,
-      });
-      // In demo mode, show the OTP in toast
-      if (result.otp) {
-        toast({
-          title: 'Demo: Your verification code',
-          description: `Code: ${result.otp} (In production, this would be emailed)`,
-        });
-      }
-      navigate('/verify-email', { state: { email: data.email.toLowerCase() } });
+      toast({ title: 'Password reset!', description: result.message });
+      navigate('/login');
     } else {
-      toast({
-        title: 'Registration failed',
-        description: result.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Reset failed', description: result.message, variant: 'destructive' });
+      setOtpValue('');
+      setValue('otp', '');
     }
 
     setIsLoading(false);
   };
+
+  if (!email) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-secondary via-background to-secondary/50 p-4">
+        <Card className="w-full max-w-md text-center p-6">
+          <p className="text-muted-foreground mb-4">No reset session found.</p>
+          <Link to="/forgot-password">
+            <Button>Request a reset code</Button>
+          </Link>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-secondary via-background to-secondary/50 p-4">
@@ -82,42 +96,33 @@ export default function Register() {
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full water-gradient">
               <Droplets className="h-6 w-6 text-primary-foreground" />
             </div>
-            <CardTitle className="text-2xl">Create an Account</CardTitle>
-            <CardDescription>Join AquaTrack to monitor your water usage</CardDescription>
+            <CardTitle className="text-2xl">Reset Password</CardTitle>
+            <CardDescription>
+              Enter the 6-digit code sent to <strong>{email}</strong> and your new password.
+            </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Your name"
-                  {...register('username')}
-                  className={errors.username ? 'border-destructive' : ''}
-                />
-                {errors.username && (
-                  <p className="text-sm text-destructive">{errors.username.message}</p>
-                )}
+                <Label>Reset Code</Label>
+                <div className="flex justify-center">
+                  <InputOTP maxLength={6} value={otpValue} onChange={handleOtpChange}>
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                      <InputOTPSlot index={3} />
+                      <InputOTPSlot index={4} />
+                      <InputOTPSlot index={5} />
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  {...register('email')}
-                  className={errors.email ? 'border-destructive' : ''}
-                />
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email.message}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="newPassword">New Password</Label>
                 <div className="relative">
                   <Input
-                    id="password"
+                    id="newPassword"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     {...register('password')}
@@ -134,10 +139,10 @@ export default function Register() {
                 <PasswordRequirements password={watchedPassword} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmNewPassword">Confirm New Password</Label>
                 <div className="relative">
                   <Input
-                    id="confirmPassword"
+                    id="confirmNewPassword"
                     type={showConfirmPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     {...register('confirmPassword')}
@@ -155,20 +160,14 @@ export default function Register() {
                   <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">
-                We'll send a verification code to your email.
-              </p>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full" disabled={isLoading || !allFieldsFilled}>
-                {isLoading ? 'Creating account...' : 'Create account'}
+              <Button type="submit" className="w-full" disabled={isLoading || !allValid}>
+                {isLoading ? 'Resetting...' : 'Reset Password'}
               </Button>
-              <p className="text-sm text-muted-foreground">
-                Already have an account?{' '}
-                <Link to="/login" className="text-primary hover:underline">
-                  Sign in
-                </Link>
-              </p>
+              <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground">
+                Back to login
+              </Link>
             </CardFooter>
           </form>
         </Card>
