@@ -48,14 +48,7 @@ export default function Register() {
         title: 'Account created!',
         description: result.message,
       });
-      // In demo mode, show the OTP in toast
-      if (result.otp) {
-        toast({
-          title: 'Demo: Your verification code',
-          description: `Code: ${result.otp} (In production, this would be emailed)`,
-        });
-      }
-      navigate('/verify-email', { state: { email: data.email.toLowerCase() } });
+      navigate('/login');
     } else {
       toast({
         title: 'Registration failed',
@@ -156,7 +149,7 @@ export default function Register() {
                 )}
               </div>
               <p className="text-xs text-muted-foreground">
-                We'll send a verification code to your email.
+                Your account will be ready to use immediately.
               </p>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
