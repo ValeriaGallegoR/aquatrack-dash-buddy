@@ -226,14 +226,12 @@ export function clearCurrentUser(): void {
 }
 
 // Register
-export function registerUser(username: string, email: string, password: string): { success: boolean; message: string; otp?: string } {
+export function registerUser(username: string, email: string, password: string): { success: boolean; message: string } {
   const users = getUsers();
 
   if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
     return { success: false, message: 'Email already in use.' };
   }
-
-  const otp = generateOtp();
 
   const newUser: User = {
     id: `user-${Date.now()}`,
@@ -242,11 +240,8 @@ export function registerUser(username: string, email: string, password: string):
     password,
     role: 'user',
     isActive: true,
-    isVerified: false,
+    isVerified: true,
     createdAt: new Date().toISOString(),
-    verificationOtp: otp,
-    otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
-    otpAttempts: 0,
   };
 
   users.push(newUser);
@@ -254,72 +249,14 @@ export function registerUser(username: string, email: string, password: string):
 
   addAuditLog({ action: 'register', email: newUser.email });
 
-  // In a real app this OTP would be emailed. For demo, we return it.
-  return { success: true, message: "We'll send a verification code to your email.", otp };
+  return { success: true, message: 'Account created successfully! You can now log in.' };
 }
 
-// Verify email OTP
-export function verifyEmailOtp(email: string, otp: string): { success: boolean; message: string } {
-  const users = getUsers();
-  const idx = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
-  if (idx === -1) return { success: false, message: 'User not found.' };
 
-  const user = users[idx];
-  if (user.isVerified) return { success: false, message: 'Email already verified.' };
 
-  // Check lock
-  if (user.otpLockedUntil && new Date(user.otpLockedUntil) > new Date()) {
-    const mins = Math.ceil((new Date(user.otpLockedUntil).getTime() - Date.now()) / 60000);
-    return { success: false, message: `Too many incorrect attempts. Try again in ${mins} minute(s).` };
-  }
-
-  // Check expiry
-  if (!user.otpExpiresAt || new Date(user.otpExpiresAt) < new Date()) {
-    return { success: false, message: 'Verification code expired. Please request a new one.' };
-  }
-
-  if (user.verificationOtp !== otp) {
-    user.otpAttempts = (user.otpAttempts || 0) + 1;
-    if (user.otpAttempts >= 5) {
-      user.otpLockedUntil = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-      user.otpAttempts = 0;
-    }
-    saveUsers(users);
-    return { success: false, message: 'Incorrect verification code.' };
-  }
-
-  user.isVerified = true;
-  user.verificationOtp = undefined;
-  user.otpExpiresAt = undefined;
-  user.otpAttempts = 0;
-  user.otpLockedUntil = undefined;
-  saveUsers(users);
-
-  addAuditLog({ action: 'verify_email', email: user.email });
-  return { success: true, message: 'Email verified successfully!' };
-}
-
-// Resend verification OTP
-export function resendVerificationOtp(email: string): { success: boolean; message: string; otp?: string } {
-  const users = getUsers();
-  const idx = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
-  if (idx === -1) return { success: false, message: 'User not found.' };
-
-  const user = users[idx];
-  if (user.isVerified) return { success: false, message: 'Email already verified.' };
-
-  const otp = generateOtp();
-  user.verificationOtp = otp;
-  user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-  user.otpAttempts = 0;
-  user.otpLockedUntil = undefined;
-  saveUsers(users);
-
-  return { success: true, message: 'New verification code sent.', otp };
-}
 
 // Login
-export function loginUser(email: string, password: string): { success: boolean; message: string; user?: CurrentUser; needsVerification?: boolean } {
+export function loginUser(email: string, password: string): { success: boolean; message: string; user?: CurrentUser } {
   // Rate limiting check
   const attempts = getLoginAttempts(email);
   if (attempts.lockedUntil && new Date(attempts.lockedUntil) > new Date()) {
@@ -347,9 +284,6 @@ export function loginUser(email: string, password: string): { success: boolean; 
     return { success: false, message: 'This account has been deactivated.' };
   }
 
-  if (!user.isVerified) {
-    return { success: false, message: 'Please verify your email before logging in.', needsVerification: true };
-  }
 
   clearLoginAttempts(email);
 

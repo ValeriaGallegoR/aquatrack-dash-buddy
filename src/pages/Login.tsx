@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
-import { loginSchema, loginUser, resendVerificationOtp } from '@/lib/auth';
+import { loginSchema, loginUser } from '@/lib/auth';
 import { useAuth } from '@/contexts/AuthContext';
 import { Droplets, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
@@ -20,7 +20,7 @@ export default function Login() {
   const { refreshUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  
 
   const {
     register,
@@ -37,7 +37,6 @@ export default function Login() {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    setUnverifiedEmail(null);
     await new Promise(resolve => setTimeout(resolve, 500));
 
     const result = loginUser(data.email, data.password);
@@ -46,9 +45,6 @@ export default function Login() {
       toast({ title: 'Welcome back!', description: result.message });
       refreshUser();
       navigate('/dashboard');
-    } else if (result.needsVerification) {
-      setUnverifiedEmail(data.email.toLowerCase());
-      toast({ title: 'Verification required', description: result.message, variant: 'destructive' });
     } else {
       toast({ title: 'Login failed', description: result.message, variant: 'destructive' });
     }
@@ -56,17 +52,6 @@ export default function Login() {
     setIsLoading(false);
   };
 
-  const handleResendVerification = async () => {
-    if (!unverifiedEmail) return;
-    const result = resendVerificationOtp(unverifiedEmail);
-    if (result.success) {
-      toast({ title: 'Code sent', description: result.message });
-      if (result.otp) {
-        toast({ title: 'Demo: Verification code', description: `Code: ${result.otp}` });
-      }
-      navigate('/verify-email', { state: { email: unverifiedEmail } });
-    }
-  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-secondary via-background to-secondary/50 p-4">
@@ -124,14 +109,6 @@ export default function Login() {
                 )}
               </div>
 
-              {unverifiedEmail && (
-                <div className="rounded-lg border border-primary/30 bg-secondary/50 p-3 text-sm">
-                  <p className="text-foreground mb-2">Please verify your email before logging in.</p>
-                  <Button type="button" variant="outline" size="sm" onClick={handleResendVerification}>
-                    Resend verification code
-                  </Button>
-                </div>
-              )}
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
