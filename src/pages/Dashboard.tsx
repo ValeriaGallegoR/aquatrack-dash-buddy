@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Header } from '@/components/Header';
+import { AppLayout } from '@/components/AppLayout';
 import { StatCard } from '@/components/StatCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -42,10 +42,8 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="container py-8">
+    <AppLayout>
+      <div className="container py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">
             Welcome back, {user?.username}! 👋
@@ -219,7 +217,7 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 }
