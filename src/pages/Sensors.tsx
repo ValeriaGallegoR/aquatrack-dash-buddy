@@ -3,6 +3,10 @@ import { AppLayout } from '@/components/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -57,6 +61,11 @@ const mockSensors: Sensor[] = [
 
 export default function Sensors() {
   const [sensors, setSensors] = useState<Sensor[]>(mockSensors);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newSensorId, setNewSensorId] = useState('');
+  const [newLocation, setNewLocation] = useState('');
+  const [newStatus, setNewStatus] = useState<'connected' | 'disconnected'>('connected');
 
   const handleRemove = (id: string) => {
     setSensors((prev) => prev.filter((s) => s.id !== id));
@@ -67,8 +76,31 @@ export default function Sensors() {
     toast.info(`Viewing details for ${sensor.name} (${sensor.sensorId})`);
   };
 
+  const resetForm = () => {
+    setNewName('');
+    setNewSensorId('');
+    setNewLocation('');
+    setNewStatus('connected');
+  };
+
   const handleAddSensor = () => {
-    toast.info('Add Sensor functionality coming soon.');
+    if (!newName.trim() || !newSensorId.trim() || !newLocation.trim()) {
+      toast.error('Please fill in all fields.');
+      return;
+    }
+    const sensor: Sensor = {
+      id: crypto.randomUUID(),
+      name: newName.trim(),
+      sensorId: newSensorId.trim(),
+      location: newLocation.trim(),
+      status: newStatus,
+      todayUsage: 0,
+      lastUpdated: 'Just now',
+    };
+    setSensors((prev) => [...prev, sensor]);
+    toast.success(`Sensor "${sensor.name}" added successfully.`);
+    resetForm();
+    setIsAddOpen(false);
   };
 
   return (
