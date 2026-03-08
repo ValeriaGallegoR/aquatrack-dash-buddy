@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Radio, Info, LogOut, Droplets, Users } from 'lucide-react';
+import { Home, LayoutDashboard, Radio, LogOut, Droplets, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NavLink } from '@/components/NavLink';
 import {
@@ -19,9 +19,9 @@ import {
 import { Button } from '@/components/ui/button';
 
 const navItems = [
+  { title: 'Home', url: '/', icon: Home },
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Sensors', url: '/sensors', icon: Radio },
-  { title: 'About', url: '/about', icon: Info },
 ];
 
 export function AppSidebar() {
