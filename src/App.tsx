@@ -16,6 +16,7 @@ import About from "./pages/About";
 import ExploreFeatures from "./pages/ExploreFeatures";
 import Dashboard from "./pages/Dashboard";
 import Sensors from "./pages/Sensors";
+import SensorDetails from "./pages/SensorDetails";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -58,6 +59,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Sensors />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/sensors/:sensorId"
+              element={
+                <ProtectedRoute>
+                  <SensorDetails />
                 </ProtectedRoute>
               }
             />

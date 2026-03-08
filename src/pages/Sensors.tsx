@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -62,6 +63,7 @@ const mockSensors: Sensor[] = [
 ];
 
 export default function Sensors() {
+  const navigate = useNavigate();
   const [sensors, setSensors] = useState<Sensor[]>(mockSensors);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [sensorToRemove, setSensorToRemove] = useState<Sensor | null>(null);
@@ -78,7 +80,7 @@ export default function Sensors() {
   };
 
   const handleViewDetails = (sensor: Sensor) => {
-    toast.info(`Viewing details for ${sensor.name} (${sensor.sensorId})`);
+    navigate(`/sensors/${sensor.sensorId}`);
   };
 
   const resetForm = () => {
