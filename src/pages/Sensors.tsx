@@ -3,6 +3,10 @@ import { AppLayout } from '@/components/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -57,6 +61,11 @@ const mockSensors: Sensor[] = [
 
 export default function Sensors() {
   const [sensors, setSensors] = useState<Sensor[]>(mockSensors);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newSensorId, setNewSensorId] = useState('');
+  const [newLocation, setNewLocation] = useState('');
+  const [newStatus, setNewStatus] = useState<'connected' | 'disconnected'>('connected');
 
   const handleRemove = (id: string) => {
     setSensors((prev) => prev.filter((s) => s.id !== id));
@@ -67,8 +76,31 @@ export default function Sensors() {
     toast.info(`Viewing details for ${sensor.name} (${sensor.sensorId})`);
   };
 
+  const resetForm = () => {
+    setNewName('');
+    setNewSensorId('');
+    setNewLocation('');
+    setNewStatus('connected');
+  };
+
   const handleAddSensor = () => {
-    toast.info('Add Sensor functionality coming soon.');
+    if (!newName.trim() || !newSensorId.trim() || !newLocation.trim()) {
+      toast.error('Please fill in all fields.');
+      return;
+    }
+    const sensor: Sensor = {
+      id: crypto.randomUUID(),
+      name: newName.trim(),
+      sensorId: newSensorId.trim(),
+      location: newLocation.trim(),
+      status: newStatus,
+      todayUsage: 0,
+      lastUpdated: 'Just now',
+    };
+    setSensors((prev) => [...prev, sensor]);
+    toast.success(`Sensor "${sensor.name}" added successfully.`);
+    resetForm();
+    setIsAddOpen(false);
   };
 
   return (
@@ -85,11 +117,50 @@ export default function Sensors() {
       </div>
 
       <div className="mb-6">
-        <Button onClick={handleAddSensor} className="gap-2">
+        <Button onClick={() => setIsAddOpen(true)} className="gap-2">
           <Plus className="h-4 w-4" />
           Add Sensor
         </Button>
       </div>
+
+      <Dialog open={isAddOpen} onOpenChange={(open) => { setIsAddOpen(open); if (!open) resetForm(); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Sensor</DialogTitle>
+            <DialogDescription>Fill in the details for your new water sensor.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="sensor-name">Sensor Name</Label>
+              <Input id="sensor-name" placeholder="e.g. Kitchen Sink" value={newName} onChange={(e) => setNewName(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sensor-id">Sensor ID</Label>
+              <Input id="sensor-id" placeholder="e.g. AQ-105" value={newSensorId} onChange={(e) => setNewSensorId(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sensor-location">Location</Label>
+              <Input id="sensor-location" placeholder="e.g. Bathroom" value={newLocation} onChange={(e) => setNewLocation(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Connection Status</Label>
+              <Select value={newStatus} onValueChange={(v) => setNewStatus(v as 'connected' | 'disconnected')}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="connected">Connected</SelectItem>
+                  <SelectItem value="disconnected">Disconnected</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { resetForm(); setIsAddOpen(false); }}>Cancel</Button>
+            <Button onClick={handleAddSensor}>Add Sensor</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {sensors.length === 0 ? (
         <Card>
