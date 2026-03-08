@@ -117,11 +117,50 @@ export default function Sensors() {
       </div>
 
       <div className="mb-6">
-        <Button onClick={handleAddSensor} className="gap-2">
+        <Button onClick={() => setIsAddOpen(true)} className="gap-2">
           <Plus className="h-4 w-4" />
           Add Sensor
         </Button>
       </div>
+
+      <Dialog open={isAddOpen} onOpenChange={(open) => { setIsAddOpen(open); if (!open) resetForm(); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Sensor</DialogTitle>
+            <DialogDescription>Fill in the details for your new water sensor.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="sensor-name">Sensor Name</Label>
+              <Input id="sensor-name" placeholder="e.g. Kitchen Sink" value={newName} onChange={(e) => setNewName(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sensor-id">Sensor ID</Label>
+              <Input id="sensor-id" placeholder="e.g. AQ-105" value={newSensorId} onChange={(e) => setNewSensorId(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sensor-location">Location</Label>
+              <Input id="sensor-location" placeholder="e.g. Bathroom" value={newLocation} onChange={(e) => setNewLocation(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Connection Status</Label>
+              <Select value={newStatus} onValueChange={(v) => setNewStatus(v as 'connected' | 'disconnected')}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="connected">Connected</SelectItem>
+                  <SelectItem value="disconnected">Disconnected</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { resetForm(); setIsAddOpen(false); }}>Cancel</Button>
+            <Button onClick={handleAddSensor}>Add Sensor</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {sensors.length === 0 ? (
         <Card>
