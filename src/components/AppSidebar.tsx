@@ -34,7 +34,8 @@ export function AppSidebar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    toast.success('You have been logged out successfully');
+    navigate('/');
   };
 
   return (
