@@ -79,7 +79,7 @@ export default function Sensors() {
   };
 
   const handleViewDetails = (sensor: Sensor) => {
-    toast.info(`Viewing details for ${sensor.name} (${sensor.sensorId})`);
+    navigate(`/sensors/${sensor.sensorId}`);
   };
 
   const resetForm = () => {
