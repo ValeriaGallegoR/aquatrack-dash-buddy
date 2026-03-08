@@ -63,6 +63,14 @@ const App = () => (
               }
             />
             <Route
+              path="/sensors/:sensorId"
+              element={
+                <ProtectedRoute>
+                  <SensorDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin"
               element={
                 <ProtectedRoute requireAdmin>

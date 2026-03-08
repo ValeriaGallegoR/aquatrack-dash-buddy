@@ -63,6 +63,7 @@ const mockSensors: Sensor[] = [
 ];
 
 export default function Sensors() {
+  const navigate = useNavigate();
   const [sensors, setSensors] = useState<Sensor[]>(mockSensors);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [sensorToRemove, setSensorToRemove] = useState<Sensor | null>(null);
