@@ -38,6 +38,14 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/explore" element={<ExploreFeatures />} />
             <Route
+              path="/home"
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/dashboard"
               element={
                 <ProtectedRoute>
