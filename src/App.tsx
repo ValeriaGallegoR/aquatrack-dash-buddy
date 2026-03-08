@@ -14,6 +14,7 @@ import ResetPassword from "./pages/ResetPassword";
 import About from "./pages/About";
 import ExploreFeatures from "./pages/ExploreFeatures";
 import Dashboard from "./pages/Dashboard";
+import Sensors from "./pages/Sensors";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
