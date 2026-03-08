@@ -63,14 +63,17 @@ const mockSensors: Sensor[] = [
 export default function Sensors() {
   const [sensors, setSensors] = useState<Sensor[]>(mockSensors);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [sensorToRemove, setSensorToRemove] = useState<Sensor | null>(null);
   const [newName, setNewName] = useState('');
   const [newSensorId, setNewSensorId] = useState('');
   const [newLocation, setNewLocation] = useState('');
   const [newStatus, setNewStatus] = useState<'connected' | 'disconnected'>('connected');
 
-  const handleRemove = (id: string) => {
-    setSensors((prev) => prev.filter((s) => s.id !== id));
-    toast.success('Sensor removed successfully.');
+  const handleRemove = () => {
+    if (!sensorToRemove) return;
+    setSensors((prev) => prev.filter((s) => s.id !== sensorToRemove.id));
+    toast.success(`"${sensorToRemove.name}" removed successfully.`);
+    setSensorToRemove(null);
   };
 
   const handleViewDetails = (sensor: Sensor) => {
