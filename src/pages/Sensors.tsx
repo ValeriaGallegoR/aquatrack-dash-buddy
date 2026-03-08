@@ -72,7 +72,8 @@ export default function Sensors() {
   };
 
   return (
-    <div className="container py-8">
+    <AppLayout>
+      <div className="container py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
           <Radio className="h-7 w-7 text-primary" />
