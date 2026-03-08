@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -62,14 +63,17 @@ const mockSensors: Sensor[] = [
 export default function Sensors() {
   const [sensors, setSensors] = useState<Sensor[]>(mockSensors);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [sensorToRemove, setSensorToRemove] = useState<Sensor | null>(null);
   const [newName, setNewName] = useState('');
   const [newSensorId, setNewSensorId] = useState('');
   const [newLocation, setNewLocation] = useState('');
   const [newStatus, setNewStatus] = useState<'connected' | 'disconnected'>('connected');
 
-  const handleRemove = (id: string) => {
-    setSensors((prev) => prev.filter((s) => s.id !== id));
-    toast.success('Sensor removed successfully.');
+  const handleRemove = () => {
+    if (!sensorToRemove) return;
+    setSensors((prev) => prev.filter((s) => s.id !== sensorToRemove.id));
+    toast.success(`"${sensorToRemove.name}" removed successfully.`);
+    setSensorToRemove(null);
   };
 
   const handleViewDetails = (sensor: Sensor) => {
@@ -217,21 +221,38 @@ export default function Sensors() {
                     <Eye className="h-3.5 w-3.5" />
                     View Details
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10"
-                    onClick={() => handleRemove(sensor.id)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    Remove
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => setSensorToRemove(sensor)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Remove
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        <AlertDialog open={!!sensorToRemove} onOpenChange={(open) => { if (!open) setSensorToRemove(null); }}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove Sensor</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to remove this sensor from your dashboard?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleRemove} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Remove Sensor
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AppLayout>
   );
