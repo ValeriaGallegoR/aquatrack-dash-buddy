@@ -161,6 +161,7 @@ export default function Sensors() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </AppLayout>
   );
 }
