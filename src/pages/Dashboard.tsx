@@ -42,10 +42,8 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="container py-8">
+    <AppLayout>
+      <div className="container py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">
             Welcome back, {user?.username}! 👋

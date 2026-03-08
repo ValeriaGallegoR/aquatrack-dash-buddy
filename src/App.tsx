@@ -45,6 +45,14 @@ const App = () => (
               }
             />
             <Route
+              path="/sensors"
+              element={
+                <ProtectedRoute>
+                  <Sensors />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin"
               element={
                 <ProtectedRoute requireAdmin>
