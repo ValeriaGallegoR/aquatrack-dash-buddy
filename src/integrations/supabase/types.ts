@@ -14,7 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      sensors: {
+        Row: {
+          id: string
+          last_updated: string
+          location: string
+          sensor_code: string
+          sensor_name: string
+          status: string
+          today_usage: number
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          last_updated?: string
+          location: string
+          sensor_code: string
+          sensor_name: string
+          status?: string
+          today_usage?: number
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          last_updated?: string
+          location?: string
+          sensor_code?: string
+          sensor_name?: string
+          status?: string
+          today_usage?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
