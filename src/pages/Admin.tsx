@@ -44,6 +44,7 @@ export default function Admin() {
   const [users, setUsers] = useState<User[]>(getUsers());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [formData, setFormData] = useState<UserFormData>({
     username: '',
     email: '',
