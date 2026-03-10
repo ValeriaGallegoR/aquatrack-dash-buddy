@@ -146,6 +146,18 @@ export default function Admin() {
     refreshUsers();
   };
 
+  const handleDeleteUser = () => {
+    if (!userToDelete) return;
+    const result = deleteUser(userToDelete.id);
+    toast({
+      title: result.success ? 'Success' : 'Error',
+      description: result.message,
+      variant: result.success ? 'default' : 'destructive',
+    });
+    refreshUsers();
+    setUserToDelete(null);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
