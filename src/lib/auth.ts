@@ -198,6 +198,23 @@ function initializeStorage(): void {
   const existingUsers = localStorage.getItem(USERS_KEY);
   if (!existingUsers) {
     localStorage.setItem(USERS_KEY, JSON.stringify(sampleUsers));
+    return;
+  }
+
+  // Ensure admin account always exists with correct credentials
+  const users: User[] = JSON.parse(existingUsers);
+  const adminIndex = users.findIndex(u => u.id === 'admin-001');
+  if (adminIndex === -1) {
+    // Admin was deleted or missing — re-add
+    users.unshift({ ...defaultAdmin, createdAt: new Date().toISOString() });
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  } else {
+    // Ensure admin credentials and role are always correct
+    const admin = users[adminIndex];
+    if (admin.email !== defaultAdmin.email || admin.password !== defaultAdmin.password || admin.role !== 'admin' || !admin.isActive) {
+      users[adminIndex] = { ...admin, email: defaultAdmin.email, password: defaultAdmin.password, role: 'admin', isActive: true };
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
   }
 }
 
