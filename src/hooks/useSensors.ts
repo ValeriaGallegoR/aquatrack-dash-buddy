@@ -1,0 +1,79 @@
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+export interface Sensor {
+  id: string;
+  user_id: string | null;
+  sensor_name: string;
+  sensor_code: string;
+  location: string;
+  status: string;
+  today_usage: number;
+  last_updated: string;
+}
+
+export function useSensors() {
+  const [sensors, setSensors] = useState<Sensor[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchSensors = useCallback(async () => {
+    setIsLoading(true);
+    const { data, error } = await supabase
+      .from('sensors')
+      .select('*')
+      .order('sensor_code', { ascending: true });
+
+    if (error) {
+      toast.error('Failed to load sensors.');
+      console.error(error);
+    } else {
+      setSensors(data as Sensor[]);
+    }
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchSensors();
+  }, [fetchSensors]);
+
+  const addSensor = async (sensor: {
+    sensor_name: string;
+    sensor_code: string;
+    location: string;
+    status: string;
+  }) => {
+    const { data, error } = await supabase
+      .from('sensors')
+      .insert({
+        sensor_name: sensor.sensor_name,
+        sensor_code: sensor.sensor_code,
+        location: sensor.location,
+        status: sensor.status,
+        today_usage: 0,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      toast.error('Failed to add sensor.');
+      console.error(error);
+      return null;
+    }
+    setSensors((prev) => [...prev, data as Sensor]);
+    return data as Sensor;
+  };
+
+  const removeSensor = async (id: string) => {
+    const { error } = await supabase.from('sensors').delete().eq('id', id);
+    if (error) {
+      toast.error('Failed to remove sensor.');
+      console.error(error);
+      return false;
+    }
+    setSensors((prev) => prev.filter((s) => s.id !== id));
+    return true;
+  };
+
+  return { sensors, isLoading, addSensor, removeSensor, refetch: fetchSensors };
+}

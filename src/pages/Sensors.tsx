@@ -10,77 +10,33 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2, Wifi, WifiOff, Activity } from 'lucide-react';
+import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2, Wifi, WifiOff, Activity, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface Sensor {
-  id: string;
-  name: string;
-  sensorId: string;
-  location: string;
-  status: 'connected' | 'disconnected';
-  todayUsage: number;
-  lastUpdated: string;
-}
-
-const mockSensors: Sensor[] = [
-  {
-    id: '1',
-    name: 'Kitchen Sink',
-    sensorId: 'AQ-101',
-    location: 'Kitchen',
-    status: 'connected',
-    todayUsage: 42,
-    lastUpdated: '10 minutes ago',
-  },
-  {
-    id: '2',
-    name: 'Bathroom Shower',
-    sensorId: 'AQ-102',
-    location: 'Bathroom',
-    status: 'connected',
-    todayUsage: 86,
-    lastUpdated: '5 minutes ago',
-  },
-  {
-    id: '3',
-    name: 'Garden Tap',
-    sensorId: 'AQ-103',
-    location: 'Garden',
-    status: 'disconnected',
-    todayUsage: 0,
-    lastUpdated: '2 hours ago',
-  },
-  {
-    id: '4',
-    name: 'Laundry Outlet',
-    sensorId: 'AQ-104',
-    location: 'Laundry Room',
-    status: 'connected',
-    todayUsage: 31,
-    lastUpdated: '18 minutes ago',
-  },
-];
+import { useSensors, Sensor } from '@/hooks/useSensors';
+import { formatDistanceToNow } from 'date-fns';
 
 export default function Sensors() {
   const navigate = useNavigate();
-  const [sensors, setSensors] = useState<Sensor[]>(mockSensors);
+  const { sensors, isLoading, addSensor, removeSensor } = useSensors();
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [sensorToRemove, setSensorToRemove] = useState<Sensor | null>(null);
   const [newName, setNewName] = useState('');
   const [newSensorId, setNewSensorId] = useState('');
   const [newLocation, setNewLocation] = useState('');
   const [newStatus, setNewStatus] = useState<'connected' | 'disconnected'>('connected');
 
-  const handleRemove = () => {
+  const handleRemove = async () => {
     if (!sensorToRemove) return;
-    setSensors((prev) => prev.filter((s) => s.id !== sensorToRemove.id));
-    toast.success(`"${sensorToRemove.name}" removed successfully.`);
+    const success = await removeSensor(sensorToRemove.id);
+    if (success) {
+      toast.success(`"${sensorToRemove.sensor_name}" removed successfully.`);
+    }
     setSensorToRemove(null);
   };
 
   const handleViewDetails = (sensor: Sensor) => {
-    navigate(`/sensors/${sensor.sensorId}`);
+    navigate(`/sensors/${sensor.sensor_code}`);
   };
 
   const resetForm = () => {
@@ -90,24 +46,32 @@ export default function Sensors() {
     setNewStatus('connected');
   };
 
-  const handleAddSensor = () => {
+  const handleAddSensor = async () => {
     if (!newName.trim() || !newSensorId.trim() || !newLocation.trim()) {
       toast.error('Please fill in all fields.');
       return;
     }
-    const sensor: Sensor = {
-      id: crypto.randomUUID(),
-      name: newName.trim(),
-      sensorId: newSensorId.trim(),
+    setIsSubmitting(true);
+    const sensor = await addSensor({
+      sensor_name: newName.trim(),
+      sensor_code: newSensorId.trim(),
       location: newLocation.trim(),
       status: newStatus,
-      todayUsage: 0,
-      lastUpdated: 'Just now',
-    };
-    setSensors((prev) => [...prev, sensor]);
-    toast.success(`Sensor "${sensor.name}" added successfully.`);
-    resetForm();
-    setIsAddOpen(false);
+    });
+    setIsSubmitting(false);
+    if (sensor) {
+      toast.success(`Sensor "${sensor.sensor_name}" added successfully.`);
+      resetForm();
+      setIsAddOpen(false);
+    }
+  };
+
+  const formatLastUpdated = (timestamp: string) => {
+    try {
+      return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+    } catch {
+      return 'Unknown';
+    }
   };
 
   const connectedCount = sensors.filter((s) => s.status === 'connected').length;
@@ -190,13 +154,20 @@ export default function Sensors() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => { resetForm(); setIsAddOpen(false); }}>Cancel</Button>
-              <Button onClick={handleAddSensor}>Add Sensor</Button>
+              <Button onClick={handleAddSensor} disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                Add Sensor
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
-        {/* Sensor Grid or Empty State */}
-        {sensors.length === 0 ? (
+        {/* Loading State */}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : sensors.length === 0 ? (
           <Card className="border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-20 text-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-6">
@@ -231,8 +202,8 @@ export default function Sensors() {
                         <Droplets className="h-4.5 w-4.5" />
                       </div>
                       <div className="min-w-0">
-                        <CardTitle className="text-base font-semibold truncate">{sensor.name}</CardTitle>
-                        <p className="text-xs text-muted-foreground font-mono mt-0.5">{sensor.sensorId}</p>
+                        <CardTitle className="text-base font-semibold truncate">{sensor.sensor_name}</CardTitle>
+                        <p className="text-xs text-muted-foreground font-mono mt-0.5">{sensor.sensor_code}</p>
                       </div>
                     </div>
                     <Badge
@@ -263,13 +234,13 @@ export default function Sensors() {
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Clock className="h-3.5 w-3.5 text-primary/70" />
-                      <span className="truncate">{sensor.lastUpdated}</span>
+                      <span className="truncate">{formatLastUpdated(sensor.last_updated)}</span>
                     </div>
                   </div>
 
                   <div className="flex items-baseline gap-1.5 rounded-lg bg-secondary/50 px-3 py-2.5">
                     <Droplets className="h-4 w-4 text-primary mt-0.5" />
-                    <span className="text-2xl font-bold text-foreground tracking-tight">{sensor.todayUsage}</span>
+                    <span className="text-2xl font-bold text-foreground tracking-tight">{sensor.today_usage}</span>
                     <span className="text-sm text-muted-foreground">L today</span>
                   </div>
 
