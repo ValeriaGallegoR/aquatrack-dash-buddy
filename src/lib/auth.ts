@@ -443,22 +443,3 @@ export function deleteUser(userId: string): { success: boolean; message: string 
 
   return { success: true, message: 'User deleted successfully' };
 }
-  const users = getUsers();
-  const index = users.findIndex(u => u.id === userId);
-
-  if (index === -1) {
-    return { success: false, message: 'User not found' };
-  }
-
-  if (users[index].id === 'admin-001' && users[index].isActive) {
-    return { success: false, message: 'Cannot deactivate the primary admin account' };
-  }
-
-  users[index].isActive = !users[index].isActive;
-  saveUsers(users);
-
-  return {
-    success: true,
-    message: `User ${users[index].isActive ? 'activated' : 'deactivated'} successfully`,
-  };
-}
