@@ -30,7 +30,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { getUsers, createUser, updateUser, toggleUserStatus, deleteUser, User } from '@/lib/auth';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, Pencil, UserCheck, UserX, Users } from 'lucide-react';
+import { Plus, Pencil, UserCheck, UserX, Users, Trash2 } from 'lucide-react';
 
 type UserFormData = {
   username: string;
