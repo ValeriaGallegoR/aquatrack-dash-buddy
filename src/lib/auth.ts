@@ -425,3 +425,21 @@ export function toggleUserStatus(userId: string): { success: boolean; message: s
     message: `User ${users[index].isActive ? 'activated' : 'deactivated'} successfully`,
   };
 }
+
+export function deleteUser(userId: string): { success: boolean; message: string } {
+  const users = getUsers();
+  const index = users.findIndex(u => u.id === userId);
+
+  if (index === -1) {
+    return { success: false, message: 'User not found' };
+  }
+
+  if (users[index].id === 'admin-001') {
+    return { success: false, message: 'Cannot delete the primary admin account' };
+  }
+
+  users.splice(index, 1);
+  saveUsers(users);
+
+  return { success: true, message: 'User deleted successfully' };
+}

@@ -142,11 +142,6 @@ export default function Login() {
             </CardFooter>
           </form>
 
-          <div className="border-t px-6 py-4">
-            <p className="text-xs text-muted-foreground text-center">
-              Demo credentials: <strong>admin@aquatrack.com</strong> / <strong>Admin123!</strong>
-            </p>
-          </div>
         </Card>
       </div>
     </div>

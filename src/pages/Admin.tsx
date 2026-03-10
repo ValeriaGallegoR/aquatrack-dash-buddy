@@ -28,9 +28,9 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
-import { getUsers, createUser, updateUser, toggleUserStatus, User } from '@/lib/auth';
+import { getUsers, createUser, updateUser, toggleUserStatus, deleteUser, User } from '@/lib/auth';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, Pencil, UserCheck, UserX, Users } from 'lucide-react';
+import { Plus, Pencil, UserCheck, UserX, Users, Trash2 } from 'lucide-react';
 
 type UserFormData = {
   username: string;
@@ -44,6 +44,7 @@ export default function Admin() {
   const [users, setUsers] = useState<User[]>(getUsers());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [formData, setFormData] = useState<UserFormData>({
     username: '',
     email: '',
@@ -145,6 +146,18 @@ export default function Admin() {
     refreshUsers();
   };
 
+  const handleDeleteUser = () => {
+    if (!userToDelete) return;
+    const result = deleteUser(userToDelete.id);
+    toast({
+      title: result.success ? 'Success' : 'Error',
+      description: result.message,
+      variant: result.success ? 'default' : 'destructive',
+    });
+    refreshUsers();
+    setUserToDelete(null);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -218,6 +231,15 @@ export default function Admin() {
                         ) : (
                           <UserCheck className="h-4 w-4 text-accent" />
                         )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setUserToDelete(user)}
+                        title="Delete user"
+                        disabled={user.id === currentUser?.id}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>
                   </TableCell>
@@ -305,6 +327,25 @@ export default function Admin() {
                 </Button>
               </DialogFooter>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={!!userToDelete} onOpenChange={(open) => { if (!open) setUserToDelete(null); }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete User</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this user? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setUserToDelete(null)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleDeleteUser}>
+                Delete
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </main>
