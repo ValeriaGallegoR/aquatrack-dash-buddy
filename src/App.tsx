@@ -9,7 +9,6 @@ import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import About from "./pages/About";
@@ -17,7 +16,9 @@ import ExploreFeatures from "./pages/ExploreFeatures";
 import Dashboard from "./pages/Dashboard";
 import Sensors from "./pages/Sensors";
 import SensorDetails from "./pages/SensorDetails";
-import Admin from "./pages/Admin";
+import Tanks from "./pages/Tanks";
+import TankDetails from "./pages/TankDetails";
+import Alerts from "./pages/Alerts";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,51 +34,17 @@ const App = () => (
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/about" element={<About />} />
             <Route path="/explore" element={<ExploreFeatures />} />
-            <Route
-              path="/home"
-              element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/sensors"
-              element={
-                <ProtectedRoute>
-                  <Sensors />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/sensors/:sensorId"
-              element={
-                <ProtectedRoute>
-                  <SensorDetails />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute requireAdmin>
-                  <Admin />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/sensors" element={<ProtectedRoute><Sensors /></ProtectedRoute>} />
+            <Route path="/sensors/:sensorId" element={<ProtectedRoute><SensorDetails /></ProtectedRoute>} />
+            <Route path="/tanks" element={<ProtectedRoute><Tanks /></ProtectedRoute>} />
+            <Route path="/tanks/:tankId" element={<ProtectedRoute><TankDetails /></ProtectedRoute>} />
+            <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

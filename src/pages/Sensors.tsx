@@ -13,11 +13,13 @@ import { Separator } from '@/components/ui/separator';
 import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2, Wifi, WifiOff, Activity, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSensors, Sensor } from '@/hooks/useSensors';
+import { useTanks } from '@/hooks/useTanks';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function Sensors() {
   const navigate = useNavigate();
   const { sensors, isLoading, addSensor, removeSensor } = useSensors();
+  const { tanks } = useTanks();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sensorToRemove, setSensorToRemove] = useState<Sensor | null>(null);
@@ -25,53 +27,33 @@ export default function Sensors() {
   const [newSensorId, setNewSensorId] = useState('');
   const [newLocation, setNewLocation] = useState('');
   const [newStatus, setNewStatus] = useState<'connected' | 'disconnected'>('connected');
+  const [newTankId, setNewTankId] = useState<string>('none');
 
   const handleRemove = async () => {
     if (!sensorToRemove) return;
     const success = await removeSensor(sensorToRemove.id);
-    if (success) {
-      toast.success(`"${sensorToRemove.sensor_name}" removed successfully.`);
-    }
+    if (success) toast.success(`"${sensorToRemove.sensor_name}" removed.`);
     setSensorToRemove(null);
   };
 
-  const handleViewDetails = (sensor: Sensor) => {
-    navigate(`/sensors/${sensor.sensor_code}`);
-  };
-
-  const resetForm = () => {
-    setNewName('');
-    setNewSensorId('');
-    setNewLocation('');
-    setNewStatus('connected');
-  };
+  const resetForm = () => { setNewName(''); setNewSensorId(''); setNewLocation(''); setNewStatus('connected'); setNewTankId('none'); };
 
   const handleAddSensor = async () => {
-    if (!newName.trim() || !newSensorId.trim() || !newLocation.trim()) {
-      toast.error('Please fill in all fields.');
-      return;
-    }
+    if (!newName.trim() || !newSensorId.trim() || !newLocation.trim()) { toast.error('Please fill in all fields.'); return; }
     setIsSubmitting(true);
     const sensor = await addSensor({
       sensor_name: newName.trim(),
       sensor_code: newSensorId.trim(),
       location: newLocation.trim(),
       status: newStatus,
+      tank_id: newTankId !== 'none' ? newTankId : undefined,
     });
     setIsSubmitting(false);
-    if (sensor) {
-      toast.success(`Sensor "${sensor.sensor_name}" added successfully.`);
-      resetForm();
-      setIsAddOpen(false);
-    }
+    if (sensor) { toast.success(`Sensor "${sensor.sensor_name}" added.`); resetForm(); setIsAddOpen(false); }
   };
 
-  const formatLastUpdated = (timestamp: string) => {
-    try {
-      return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
-    } catch {
-      return 'Unknown';
-    }
+  const formatLastUpdated = (ts: string) => {
+    try { return formatDistanceToNow(new Date(ts), { addSuffix: true }); } catch { return 'Unknown'; }
   };
 
   const connectedCount = sensors.filter((s) => s.status === 'connected').length;
@@ -80,71 +62,51 @@ export default function Sensors() {
   return (
     <AppLayout>
       <div className="container py-8 space-y-8">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <Radio className="h-5 w-5 text-primary" />
-              </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10"><Radio className="h-5 w-5 text-primary" /></div>
               Sensors Dashboard
             </h1>
-            <p className="text-muted-foreground mt-2 ml-[52px]">
-              Manage and monitor your connected water sensors
-            </p>
+            <p className="text-muted-foreground mt-2 ml-[52px]">Manage and monitor your connected water sensors</p>
           </div>
-          <Button onClick={() => setIsAddOpen(true)} className="gap-2 self-start sm:self-auto">
-            <Plus className="h-4 w-4" />
-            Add Sensor
-          </Button>
+          <Button onClick={() => setIsAddOpen(true)} className="gap-2 self-start sm:self-auto"><Plus className="h-4 w-4" /> Add Sensor</Button>
         </div>
 
-        {/* Summary Stats */}
         {sensors.length > 0 && (
           <div className="flex items-center gap-6 text-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Activity className="h-4 w-4 text-primary" />
-              <span className="font-semibold text-foreground">{sensors.length}</span> Total
-            </div>
+            <div className="flex items-center gap-2 text-muted-foreground"><Activity className="h-4 w-4 text-primary" /><span className="font-semibold text-foreground">{sensors.length}</span> Total</div>
             <Separator orientation="vertical" className="h-4" />
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Wifi className="h-4 w-4 text-accent" />
-              <span className="font-semibold text-foreground">{connectedCount}</span> Online
-            </div>
+            <div className="flex items-center gap-2 text-muted-foreground"><Wifi className="h-4 w-4 text-accent" /><span className="font-semibold text-foreground">{connectedCount}</span> Online</div>
             <Separator orientation="vertical" className="h-4" />
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <WifiOff className="h-4 w-4 text-destructive/60" />
-              <span className="font-semibold text-foreground">{disconnectedCount}</span> Offline
-            </div>
+            <div className="flex items-center gap-2 text-muted-foreground"><WifiOff className="h-4 w-4 text-destructive/60" /><span className="font-semibold text-foreground">{disconnectedCount}</span> Offline</div>
           </div>
         )}
 
-        {/* Add Sensor Dialog */}
-        <Dialog open={isAddOpen} onOpenChange={(open) => { setIsAddOpen(open); if (!open) resetForm(); }}>
+        <Dialog open={isAddOpen} onOpenChange={(o) => { setIsAddOpen(o); if (!o) resetForm(); }}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Add New Sensor</DialogTitle>
               <DialogDescription>Fill in the details for your new water sensor.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-2">
+              <div className="space-y-2"><Label htmlFor="sensor-name">Sensor Name</Label><Input id="sensor-name" placeholder="e.g. Kitchen Sink" value={newName} onChange={(e) => setNewName(e.target.value)} /></div>
+              <div className="space-y-2"><Label htmlFor="sensor-id">Sensor ID</Label><Input id="sensor-id" placeholder="e.g. AQ-105" value={newSensorId} onChange={(e) => setNewSensorId(e.target.value)} /></div>
+              <div className="space-y-2"><Label htmlFor="sensor-location">Location</Label><Input id="sensor-location" placeholder="e.g. Bathroom" value={newLocation} onChange={(e) => setNewLocation(e.target.value)} /></div>
               <div className="space-y-2">
-                <Label htmlFor="sensor-name">Sensor Name</Label>
-                <Input id="sensor-name" placeholder="e.g. Kitchen Sink" value={newName} onChange={(e) => setNewName(e.target.value)} />
+                <Label>Assign to Tank</Label>
+                <Select value={newTankId} onValueChange={setNewTankId}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No tank</SelectItem>
+                    {tanks.map((t) => <SelectItem key={t.id} value={t.id}>{t.tank_name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="sensor-id">Sensor ID</Label>
-                <Input id="sensor-id" placeholder="e.g. AQ-105" value={newSensorId} onChange={(e) => setNewSensorId(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="sensor-location">Location</Label>
-                <Input id="sensor-location" placeholder="e.g. Bathroom" value={newLocation} onChange={(e) => setNewLocation(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label>Connection Status</Label>
+                <Label>Status</Label>
                 <Select value={newStatus} onValueChange={(v) => setNewStatus(v as 'connected' | 'disconnected')}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="connected">Connected</SelectItem>
                     <SelectItem value="disconnected">Disconnected</SelectItem>
@@ -154,51 +116,30 @@ export default function Sensors() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => { resetForm(); setIsAddOpen(false); }}>Cancel</Button>
-              <Button onClick={handleAddSensor} disabled={isSubmitting}>
-                {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                Add Sensor
-              </Button>
+              <Button onClick={handleAddSensor} disabled={isSubmitting}>{isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Add Sensor</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
-        {/* Loading State */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
+          <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
         ) : sensors.length === 0 ? (
           <Card className="border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-6">
-                <Radio className="h-8 w-8 text-primary" />
-              </div>
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-6"><Radio className="h-8 w-8 text-primary" /></div>
               <h2 className="text-xl font-semibold text-foreground mb-2">No sensors connected</h2>
-              <p className="text-muted-foreground max-w-sm mb-8">
-                Add your first sensor to start tracking water usage.
-              </p>
-              <Button onClick={() => setIsAddOpen(true)} size="lg" className="gap-2">
-                <Plus className="h-5 w-5" />
-                Add Sensor
-              </Button>
+              <p className="text-muted-foreground max-w-sm mb-8">Add your first sensor to start tracking water usage.</p>
+              <Button onClick={() => setIsAddOpen(true)} size="lg" className="gap-2"><Plus className="h-5 w-5" /> Add Sensor</Button>
             </CardContent>
           </Card>
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {sensors.map((sensor, index) => (
-              <Card
-                key={sensor.id}
-                className="group relative overflow-hidden border border-border/60 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300 animate-fade-in"
-                style={{ animationDelay: `${index * 75}ms`, animationFillMode: 'backwards' }}
-              >
+              <Card key={sensor.id} className="group relative overflow-hidden border border-border/60 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: `${index * 75}ms`, animationFillMode: 'backwards' }}>
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
-                        sensor.status === 'connected'
-                          ? 'bg-accent/15 text-accent'
-                          : 'bg-muted text-muted-foreground'
-                      }`}>
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${sensor.status === 'connected' ? 'bg-accent/15 text-accent' : 'bg-muted text-muted-foreground'}`}>
                         <Droplets className="h-4.5 w-4.5" />
                       </div>
                       <div className="min-w-0">
@@ -206,63 +147,26 @@ export default function Sensors() {
                         <p className="text-xs text-muted-foreground font-mono mt-0.5">{sensor.sensor_code}</p>
                       </div>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className={`shrink-0 gap-1.5 text-xs font-medium ${
-                        sensor.status === 'connected'
-                          ? 'border-accent/40 bg-accent/10 text-accent'
-                          : 'border-destructive/30 bg-destructive/5 text-destructive/80'
-                      }`}
-                    >
-                      {sensor.status === 'connected' ? (
-                        <Wifi className="h-3 w-3" />
-                      ) : (
-                        <WifiOff className="h-3 w-3" />
-                      )}
+                    <Badge variant="outline" className={`shrink-0 gap-1.5 text-xs font-medium ${sensor.status === 'connected' ? 'border-accent/40 bg-accent/10 text-accent' : 'border-destructive/30 bg-destructive/5 text-destructive/80'}`}>
+                      {sensor.status === 'connected' ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
                       {sensor.status === 'connected' ? 'Connected' : 'Offline'}
                     </Badge>
                   </div>
                 </CardHeader>
-
                 <CardContent className="space-y-4">
                   <Separator />
-
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <MapPin className="h-3.5 w-3.5 text-primary/70" />
-                      <span className="truncate">{sensor.location}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Clock className="h-3.5 w-3.5 text-primary/70" />
-                      <span className="truncate">{formatLastUpdated(sensor.last_updated)}</span>
-                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="h-3.5 w-3.5 text-primary/70" /><span className="truncate">{sensor.location}</span></div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground"><Clock className="h-3.5 w-3.5 text-primary/70" /><span className="truncate">{formatLastUpdated(sensor.last_updated)}</span></div>
                   </div>
-
                   <div className="flex items-baseline gap-1.5 rounded-lg bg-secondary/50 px-3 py-2.5">
                     <Droplets className="h-4 w-4 text-primary mt-0.5" />
                     <span className="text-2xl font-bold text-foreground tracking-tight">{sensor.today_usage}</span>
                     <span className="text-sm text-muted-foreground">L today</span>
                   </div>
-
                   <div className="flex gap-2 pt-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 gap-1.5"
-                      onClick={() => handleViewDetails(sensor)}
-                    >
-                      <Eye className="h-3.5 w-3.5" />
-                      Details
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => setSensorToRemove(sensor)}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                      Remove
-                    </Button>
+                    <Button variant="outline" size="sm" className="flex-1 gap-1.5" onClick={() => navigate(`/sensors/${sensor.sensor_code}`)}><Eye className="h-3.5 w-3.5" /> Details</Button>
+                    <Button variant="outline" size="sm" className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setSensorToRemove(sensor)}><Trash2 className="h-3.5 w-3.5" /> Remove</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -270,20 +174,12 @@ export default function Sensors() {
           </div>
         )}
 
-        {/* Remove Confirmation */}
-        <AlertDialog open={!!sensorToRemove} onOpenChange={(open) => { if (!open) setSensorToRemove(null); }}>
+        <AlertDialog open={!!sensorToRemove} onOpenChange={(o) => { if (!o) setSensorToRemove(null); }}>
           <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Remove Sensor</AlertDialogTitle>
-              <AlertDialogDescription>
-                Are you sure you want to remove this sensor from your dashboard?
-              </AlertDialogDescription>
-            </AlertDialogHeader>
+            <AlertDialogHeader><AlertDialogTitle>Remove Sensor</AlertDialogTitle><AlertDialogDescription>Are you sure you want to remove this sensor?</AlertDialogDescription></AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleRemove} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                Remove Sensor
-              </AlertDialogAction>
+              <AlertDialogAction onClick={handleRemove} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Remove Sensor</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

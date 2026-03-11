@@ -14,6 +14,94 @@ export type Database = {
   }
   public: {
     Tables: {
+      alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          sensor_id: string | null
+          user_id: string
+        }
+        Insert: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          sensor_id?: string | null
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          sensor_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_sensor_id_fkey"
+            columns: ["sensor_id"]
+            isOneToOne: false
+            referencedRelation: "sensors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      sensor_readings: {
+        Row: {
+          id: string
+          reading_value: number
+          recorded_at: string
+          sensor_id: string
+        }
+        Insert: {
+          id?: string
+          reading_value?: number
+          recorded_at?: string
+          sensor_id: string
+        }
+        Update: {
+          id?: string
+          reading_value?: number
+          recorded_at?: string
+          sensor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sensor_readings_sensor_id_fkey"
+            columns: ["sensor_id"]
+            isOneToOne: false
+            referencedRelation: "sensors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sensors: {
         Row: {
           id: string
@@ -22,6 +110,7 @@ export type Database = {
           sensor_code: string
           sensor_name: string
           status: string
+          tank_id: string | null
           today_usage: number
           user_id: string | null
         }
@@ -32,6 +121,7 @@ export type Database = {
           sensor_code: string
           sensor_name: string
           status?: string
+          tank_id?: string | null
           today_usage?: number
           user_id?: string | null
         }
@@ -42,8 +132,76 @@ export type Database = {
           sensor_code?: string
           sensor_name?: string
           status?: string
+          tank_id?: string | null
           today_usage?: number
           user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sensors_tank_id_fkey"
+            columns: ["tank_id"]
+            isOneToOne: false
+            referencedRelation: "tanks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tank_logs: {
+        Row: {
+          action: string
+          created_at: string
+          details: string | null
+          id: string
+          tank_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          tank_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          tank_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tank_logs_tank_id_fkey"
+            columns: ["tank_id"]
+            isOneToOne: false
+            referencedRelation: "tanks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tanks: {
+        Row: {
+          capacity: number
+          created_at: string
+          id: string
+          location: string
+          tank_name: string
+          user_id: string
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string
+          id?: string
+          location?: string
+          tank_name: string
+          user_id: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          id?: string
+          location?: string
+          tank_name?: string
+          user_id?: string
         }
         Relationships: []
       }
