@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 export interface Sensor {
   id: string;
   user_id: string | null;
-  tank_id: string | null;
   sensor_name: string;
   sensor_code: string;
   location: string;
@@ -15,7 +14,7 @@ export interface Sensor {
   last_updated: string;
 }
 
-export function useSensors(tankId?: string) {
+export function useSensors() {
   const { user } = useAuth();
   const [sensors, setSensors] = useState<Sensor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,18 +22,15 @@ export function useSensors(tankId?: string) {
   const fetchSensors = useCallback(async () => {
     if (!user) { setSensors([]); setIsLoading(false); return; }
     setIsLoading(true);
-    let query = supabase.from('sensors').select('*').order('sensor_code', { ascending: true });
-    if (tankId) query = query.eq('tank_id', tankId);
-
-    const { data, error } = await query;
+    const { data, error } = await supabase.from('sensors').select('*').order('sensor_code', { ascending: true });
     if (error) { toast.error('Failed to load sensors.'); console.error(error); }
     else setSensors((data ?? []) as Sensor[]);
     setIsLoading(false);
-  }, [user, tankId]);
+  }, [user]);
 
   useEffect(() => { fetchSensors(); }, [fetchSensors]);
 
-  const addSensor = async (sensor: { sensor_name: string; sensor_code: string; location: string; status: string; tank_id?: string }) => {
+  const addSensor = async (sensor: { sensor_name: string; sensor_code: string; location: string; status: string }) => {
     if (!user) return null;
     const { data, error } = await supabase.from('sensors').insert({
       sensor_name: sensor.sensor_name,
@@ -43,7 +39,6 @@ export function useSensors(tankId?: string) {
       status: sensor.status,
       today_usage: 0,
       user_id: user.id,
-      tank_id: sensor.tank_id || null,
     }).select().single();
 
     if (error) { toast.error('Failed to add sensor.'); console.error(error); return null; }

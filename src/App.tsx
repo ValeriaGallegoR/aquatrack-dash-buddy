@@ -16,8 +16,6 @@ import ExploreFeatures from "./pages/ExploreFeatures";
 import Dashboard from "./pages/Dashboard";
 import Sensors from "./pages/Sensors";
 import SensorDetails from "./pages/SensorDetails";
-import Tanks from "./pages/Tanks";
-import TankDetails from "./pages/TankDetails";
 import Alerts from "./pages/Alerts";
 import NotFound from "./pages/NotFound";
 
@@ -42,8 +40,6 @@ const App = () => (
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/sensors" element={<ProtectedRoute><Sensors /></ProtectedRoute>} />
             <Route path="/sensors/:sensorId" element={<ProtectedRoute><SensorDetails /></ProtectedRoute>} />
-            <Route path="/tanks" element={<ProtectedRoute><Tanks /></ProtectedRoute>} />
-            <Route path="/tanks/:tankId" element={<ProtectedRoute><TankDetails /></ProtectedRoute>} />
             <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

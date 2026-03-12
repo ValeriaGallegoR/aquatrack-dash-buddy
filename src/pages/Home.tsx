@@ -3,15 +3,13 @@ import { AppLayout } from '@/components/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSensors } from '@/hooks/useSensors';
-import { useTanks } from '@/hooks/useTanks';
 import { useAlerts } from '@/hooks/useAlerts';
-import { Droplets, LayoutDashboard, Radio, Container, Bell, Wifi } from 'lucide-react';
+import { Droplets, LayoutDashboard, Radio, Bell, Wifi } from 'lucide-react';
 
 export default function Home() {
   const { profile } = useAuth();
   const navigate = useNavigate();
   const { sensors } = useSensors();
-  const { tanks } = useTanks();
   const { alerts } = useAlerts();
 
   const connectedCount = sensors.filter((s) => s.status === 'connected').length;
@@ -29,7 +27,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Card className="cursor-pointer border border-border hover:border-primary/40 hover:shadow-md transition-all group" onClick={() => navigate('/dashboard')}>
             <CardContent className="flex items-center gap-4 p-6">
               <div className="rounded-lg bg-primary/10 p-3 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors"><LayoutDashboard className="h-6 w-6" /></div>
@@ -42,12 +40,6 @@ export default function Home() {
               <div><p className="font-semibold text-foreground">Sensors</p><p className="text-sm text-muted-foreground">Manage &amp; monitor devices</p></div>
             </CardContent>
           </Card>
-          <Card className="cursor-pointer border border-border hover:border-primary/40 hover:shadow-md transition-all group" onClick={() => navigate('/tanks')}>
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="rounded-lg bg-primary/10 p-3 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors"><Container className="h-6 w-6" /></div>
-              <div><p className="font-semibold text-foreground">Tanks</p><p className="text-sm text-muted-foreground">Create &amp; view water tanks</p></div>
-            </CardContent>
-          </Card>
           <Card className="cursor-pointer border border-border hover:border-primary/40 hover:shadow-md transition-all group" onClick={() => navigate('/alerts')}>
             <CardContent className="flex items-center gap-4 p-6">
               <div className="rounded-lg bg-primary/10 p-3 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors"><Bell className="h-6 w-6" /></div>
@@ -58,13 +50,7 @@ export default function Home() {
 
         <div>
           <h2 className="text-lg font-semibold text-foreground mb-4">Overview</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Card className="border border-border">
-              <CardContent className="flex items-center gap-4 p-5">
-                <div className="rounded-lg bg-primary/10 p-2.5 text-primary"><Container className="h-5 w-5" /></div>
-                <div><p className="text-sm text-muted-foreground">Total Tanks</p><p className="text-xl font-bold text-foreground">{tanks.length}</p></div>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Card className="border border-border">
               <CardContent className="flex items-center gap-4 p-5">
                 <div className="rounded-lg bg-accent/10 p-2.5 text-accent"><Wifi className="h-5 w-5" /></div>
