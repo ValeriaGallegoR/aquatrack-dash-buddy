@@ -13,13 +13,11 @@ import { Separator } from '@/components/ui/separator';
 import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2, Wifi, WifiOff, Activity, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSensors, Sensor } from '@/hooks/useSensors';
-import { useTanks } from '@/hooks/useTanks';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function Sensors() {
   const navigate = useNavigate();
   const { sensors, isLoading, addSensor, removeSensor } = useSensors();
-  const { tanks } = useTanks();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sensorToRemove, setSensorToRemove] = useState<Sensor | null>(null);
@@ -27,7 +25,6 @@ export default function Sensors() {
   const [newSensorId, setNewSensorId] = useState('');
   const [newLocation, setNewLocation] = useState('');
   const [newStatus, setNewStatus] = useState<'connected' | 'disconnected'>('connected');
-  const [newTankId, setNewTankId] = useState<string>('none');
 
   const handleRemove = async () => {
     if (!sensorToRemove) return;
@@ -36,7 +33,7 @@ export default function Sensors() {
     setSensorToRemove(null);
   };
 
-  const resetForm = () => { setNewName(''); setNewSensorId(''); setNewLocation(''); setNewStatus('connected'); setNewTankId('none'); };
+  const resetForm = () => { setNewName(''); setNewSensorId(''); setNewLocation(''); setNewStatus('connected'); };
 
   const handleAddSensor = async () => {
     if (!newName.trim() || !newSensorId.trim() || !newLocation.trim()) { toast.error('Please fill in all fields.'); return; }
@@ -46,7 +43,6 @@ export default function Sensors() {
       sensor_code: newSensorId.trim(),
       location: newLocation.trim(),
       status: newStatus,
-      tank_id: newTankId !== 'none' ? newTankId : undefined,
     });
     setIsSubmitting(false);
     if (sensor) { toast.success(`Sensor "${sensor.sensor_name}" added.`); resetForm(); setIsAddOpen(false); }
@@ -93,16 +89,6 @@ export default function Sensors() {
               <div className="space-y-2"><Label htmlFor="sensor-name">Sensor Name</Label><Input id="sensor-name" placeholder="e.g. Kitchen Sink" value={newName} onChange={(e) => setNewName(e.target.value)} /></div>
               <div className="space-y-2"><Label htmlFor="sensor-id">Sensor ID</Label><Input id="sensor-id" placeholder="e.g. AQ-105" value={newSensorId} onChange={(e) => setNewSensorId(e.target.value)} /></div>
               <div className="space-y-2"><Label htmlFor="sensor-location">Location</Label><Input id="sensor-location" placeholder="e.g. Bathroom" value={newLocation} onChange={(e) => setNewLocation(e.target.value)} /></div>
-              <div className="space-y-2">
-                <Label>Assign to Tank</Label>
-                <Select value={newTankId} onValueChange={setNewTankId}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">No tank</SelectItem>
-                    {tanks.map((t) => <SelectItem key={t.id} value={t.id}>{t.tank_name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
               <div className="space-y-2">
                 <Label>Status</Label>
                 <Select value={newStatus} onValueChange={(v) => setNewStatus(v as 'connected' | 'disconnected')}>

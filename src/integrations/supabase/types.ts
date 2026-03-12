@@ -110,7 +110,6 @@ export type Database = {
           sensor_code: string
           sensor_name: string
           status: string
-          tank_id: string | null
           today_usage: number
           user_id: string | null
         }
@@ -121,7 +120,6 @@ export type Database = {
           sensor_code: string
           sensor_name: string
           status?: string
-          tank_id?: string | null
           today_usage?: number
           user_id?: string | null
         }
@@ -132,75 +130,25 @@ export type Database = {
           sensor_code?: string
           sensor_name?: string
           status?: string
-          tank_id?: string | null
           today_usage?: number
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "sensors_tank_id_fkey"
-            columns: ["tank_id"]
-            isOneToOne: false
-            referencedRelation: "tanks"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
-      tank_logs: {
+      user_roles: {
         Row: {
-          action: string
-          created_at: string
-          details: string | null
           id: string
-          tank_id: string
-        }
-        Insert: {
-          action: string
-          created_at?: string
-          details?: string | null
-          id?: string
-          tank_id: string
-        }
-        Update: {
-          action?: string
-          created_at?: string
-          details?: string | null
-          id?: string
-          tank_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tank_logs_tank_id_fkey"
-            columns: ["tank_id"]
-            isOneToOne: false
-            referencedRelation: "tanks"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      tanks: {
-        Row: {
-          capacity: number
-          created_at: string
-          id: string
-          location: string
-          tank_name: string
+          role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
-          capacity?: number
-          created_at?: string
           id?: string
-          location?: string
-          tank_name: string
+          role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
-          capacity?: number
-          created_at?: string
           id?: string
-          location?: string
-          tank_name?: string
+          role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
         Relationships: []
@@ -210,10 +158,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -340,6 +294,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

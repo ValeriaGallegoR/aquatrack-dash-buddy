@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LayoutDashboard, Radio, LogOut, Droplets, Bell, Container } from 'lucide-react';
+import { Home, LayoutDashboard, Radio, LogOut, Droplets, Bell } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { NavLink } from '@/components/NavLink';
@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 const navItems = [
   { title: 'Home', url: '/home', icon: Home },
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'Tanks', url: '/tanks', icon: Container },
   { title: 'Sensors', url: '/sensors', icon: Radio },
   { title: 'Alerts', url: '/alerts', icon: Bell },
 ];
