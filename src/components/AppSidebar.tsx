@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LayoutDashboard, Radio, LogOut, Droplets, Bell } from 'lucide-react';
+import { Home, LayoutDashboard, Radio, LogOut, Droplets, Bell, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { NavLink } from '@/components/NavLink';
@@ -9,19 +9,25 @@ import {
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 
-const navItems = [
+const userNavItems = [
   { title: 'Home', url: '/home', icon: Home },
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Sensors', url: '/sensors', icon: Radio },
   { title: 'Alerts', url: '/alerts', icon: Bell },
 ];
 
+const adminNavItems = [
+  { title: 'Admin Dashboard', url: '/admin', icon: Users },
+];
+
 export function AppSidebar() {
-  const { profile, logout } = useAuth();
+  const { profile, isAdmin, logout } = useAuth();
   const { state } = useSidebar();
   const navigate = useNavigate();
   const location = useLocation();
   const collapsed = state === 'collapsed';
+
+  const navItems = isAdmin ? adminNavItems : userNavItems;
 
   const handleLogout = async () => {
     await logout();
@@ -46,7 +52,7 @@ export function AppSidebar() {
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={location.pathname === item.url || location.pathname.startsWith(item.url + '/')} tooltip={item.title}>
-                    <NavLink to={item.url} end={item.url === '/home'} className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                    <NavLink to={item.url} end={item.url === '/home' || item.url === '/admin'} className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
                       <item.icon className="h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>

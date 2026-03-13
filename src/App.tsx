@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import Sensors from "./pages/Sensors";
 import SensorDetails from "./pages/SensorDetails";
 import Alerts from "./pages/Alerts";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/sensors" element={<ProtectedRoute><Sensors /></ProtectedRoute>} />
             <Route path="/sensors/:sensorId" element={<ProtectedRoute><SensorDetails /></ProtectedRoute>} />
             <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
