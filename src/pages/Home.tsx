@@ -5,12 +5,22 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSensors } from '@/hooks/useSensors';
 import { useAlerts } from '@/hooks/useAlerts';
 import { Droplets, LayoutDashboard, Radio, Bell, Wifi } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function Home() {
-  const { profile } = useAuth();
+  const { profile, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { sensors } = useSensors();
   const { alerts } = useAlerts();
+
+  // Redirect admin to admin dashboard
+  useEffect(() => {
+    if (isAdmin) {
+      navigate('/admin', { replace: true });
+    }
+  }, [isAdmin, navigate]);
+
+  if (isAdmin) return null;
 
   const connectedCount = sensors.filter((s) => s.status === 'connected').length;
   const unreadAlerts = alerts.filter((a) => !a.is_read).length;

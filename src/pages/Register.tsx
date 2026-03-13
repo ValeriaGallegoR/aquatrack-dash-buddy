@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Droplets, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { PasswordRequirements } from '@/components/PasswordRequirements';
+import { isPasswordStrong } from '@/lib/auth';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -19,12 +21,12 @@ export default function Register() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
+    if (!isPasswordStrong(password)) {
+      toast.error('Password does not meet all requirements');
       return;
     }
-    if (password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
       return;
     }
     setIsLoading(true);
@@ -79,6 +81,7 @@ export default function Register() {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+                <PasswordRequirements password={password} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
