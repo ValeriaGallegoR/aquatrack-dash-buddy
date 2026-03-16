@@ -1,5 +1,7 @@
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSensors } from '@/hooks/useSensors';
 import { Droplets, TrendingUp, BarChart3, Wifi, Loader2 } from 'lucide-react';
@@ -7,6 +9,7 @@ import { Droplets, TrendingUp, BarChart3, Wifi, Loader2 } from 'lucide-react';
 export default function Dashboard() {
   const { profile } = useAuth();
   const { sensors, isLoading } = useSensors();
+  const navigate = useNavigate();
 
   const totalUsage = sensors.reduce((sum, s) => sum + s.today_usage, 0);
   const connectedCount = sensors.filter((s) => s.status === 'connected').length;
@@ -22,28 +25,33 @@ export default function Dashboard() {
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+          <div className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((i) => <Skeleton key={i} className="h-28 rounded-xl" />)}
+            </div>
+            <Skeleton className="h-64 rounded-xl" />
+          </div>
         ) : (
           <>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
-              <Card>
+              <Card className="hover-glow">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Usage Today</CardTitle>
-                  <Droplets className="h-4 w-4 text-primary" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10"><Droplets className="h-4 w-4 text-primary" /></div>
                 </CardHeader>
                 <CardContent><div className="text-2xl font-bold">{totalUsage} L</div><p className="text-xs text-muted-foreground">Across all sensors</p></CardContent>
               </Card>
-              <Card>
+              <Card className="hover-glow">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Sensors</CardTitle>
-                  <BarChart3 className="h-4 w-4 text-primary" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10"><BarChart3 className="h-4 w-4 text-primary" /></div>
                 </CardHeader>
                 <CardContent><div className="text-2xl font-bold">{sensors.length}</div><p className="text-xs text-muted-foreground">{connectedCount} connected</p></CardContent>
               </Card>
-              <Card>
+              <Card className="hover-glow">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Online Rate</CardTitle>
-                  <Wifi className="h-4 w-4 text-accent" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10"><Wifi className="h-4 w-4 text-primary" /></div>
                 </CardHeader>
                 <CardContent><div className="text-2xl font-bold">{sensors.length > 0 ? Math.round((connectedCount / sensors.length) * 100) : 0}%</div><p className="text-xs text-muted-foreground">Sensors online</p></CardContent>
               </Card>
@@ -59,9 +67,13 @@ export default function Dashboard() {
                 ) : (
                   <div className="space-y-3">
                     {sensors.map((s) => (
-                      <div key={s.id} className="flex items-center justify-between rounded-lg border p-3">
+                      <div
+                        key={s.id}
+                        onClick={() => navigate(`/sensors/${s.sensor_code}`)}
+                        className="flex items-center justify-between rounded-lg border p-3 card-3d"
+                      >
                         <div className="flex items-center gap-3">
-                          <Droplets className="h-4 w-4 text-primary" />
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10"><Droplets className="h-4 w-4 text-primary" /></div>
                           <div>
                             <p className="font-medium text-foreground text-sm">{s.sensor_name}</p>
                             <p className="text-xs text-muted-foreground">{s.location} · {s.sensor_code}</p>

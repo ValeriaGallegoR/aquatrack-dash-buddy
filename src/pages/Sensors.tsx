@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -108,7 +109,9 @@ export default function Sensors() {
         </Dialog>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-56 rounded-xl" />)}
+          </div>
         ) : sensors.length === 0 ? (
           <Card className="border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-20 text-center">
@@ -121,11 +124,16 @@ export default function Sensors() {
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {sensors.map((sensor, index) => (
-              <Card key={sensor.id} className="group relative overflow-hidden border border-border/60 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: `${index * 75}ms`, animationFillMode: 'backwards' }}>
+              <Card
+                key={sensor.id}
+                onClick={() => navigate(`/sensors/${sensor.sensor_code}`)}
+                className="group relative overflow-hidden border border-border/60 card-3d animate-fade-in"
+                style={{ animationDelay: `${index * 75}ms`, animationFillMode: 'backwards' }}
+              >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${sensor.status === 'connected' ? 'bg-accent/15 text-accent' : 'bg-muted text-muted-foreground'}`}>
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${sensor.status === 'connected' ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'}`}>
                         <Droplets className="h-4.5 w-4.5" />
                       </div>
                       <div className="min-w-0">
@@ -133,7 +141,7 @@ export default function Sensors() {
                         <p className="text-xs text-muted-foreground font-mono mt-0.5">{sensor.sensor_code}</p>
                       </div>
                     </div>
-                    <Badge variant="outline" className={`shrink-0 gap-1.5 text-xs font-medium ${sensor.status === 'connected' ? 'border-accent/40 bg-accent/10 text-accent' : 'border-destructive/30 bg-destructive/5 text-destructive/80'}`}>
+                    <Badge variant="outline" className={`shrink-0 gap-1.5 text-xs font-medium ${sensor.status === 'connected' ? 'border-primary/40 bg-primary/10 text-primary' : 'border-destructive/30 bg-destructive/5 text-destructive/80'}`}>
                       {sensor.status === 'connected' ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
                       {sensor.status === 'connected' ? 'Connected' : 'Offline'}
                     </Badge>
@@ -150,7 +158,7 @@ export default function Sensors() {
                     <span className="text-2xl font-bold text-foreground tracking-tight">{sensor.today_usage}</span>
                     <span className="text-sm text-muted-foreground">L today</span>
                   </div>
-                  <div className="flex gap-2 pt-1">
+                  <div className="flex gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
                     <Button variant="outline" size="sm" className="flex-1 gap-1.5" onClick={() => navigate(`/sensors/${sensor.sensor_code}`)}><Eye className="h-3.5 w-3.5" /> Details</Button>
                     <Button variant="outline" size="sm" className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setSensorToRemove(sensor)}><Trash2 className="h-3.5 w-3.5" /> Remove</Button>
                   </div>
