@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/AppLayout';
+import WaterAnalyticsBackground from '@/components/WaterAnalyticsBackground';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSensors } from '@/hooks/useSensors';
-import { Droplets, TrendingUp, BarChart3, Wifi, Loader2 } from 'lucide-react';
+import { Droplets, TrendingUp, BarChart3, Wifi } from 'lucide-react';
 
 export default function Dashboard() {
   const { profile } = useAuth();
