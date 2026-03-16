@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/AppLayout';
+import WaterAnalyticsBackground from '@/components/WaterAnalyticsBackground';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +13,6 @@ import { formatDistanceToNow } from 'date-fns';
 
 type TimeRange = 'daily' | 'weekly' | 'monthly';
 
-// Generate deterministic mock data based on sensor id
 function generateMockData(sensorCode: string, range: TimeRange) {
   const seed = sensorCode.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
   const rand = (i: number) => ((seed * (i + 1) * 9301 + 49297) % 233280) / 233280;
@@ -32,13 +32,7 @@ function generateMockData(sensorCode: string, range: TimeRange) {
 function computeMetrics(data: { current: number }[]) {
   const values = data.map((d) => d.current);
   const total = values.reduce((a, b) => a + b, 0);
-  return {
-    total,
-    avg: Math.round(total / values.length),
-    max: Math.max(...values),
-    min: Math.min(...values),
-    latest: values[values.length - 1],
-  };
+  return { total, avg: Math.round(total / values.length), max: Math.max(...values), min: Math.min(...values), latest: values[values.length - 1] };
 }
 
 function pctChange(curr: number, prev: number) {
@@ -52,6 +46,11 @@ const timeRangeLabels: Record<TimeRange, { current: string; previous: string }> 
   monthly: { current: 'This Month', previous: 'Last Month' },
 };
 
+const CHART_LABEL_COLOR = 'hsl(var(--chart-label))';
+const CHART_GRID_COLOR = 'hsl(var(--chart-grid))';
+const CHART_PRIMARY = 'hsl(var(--primary))';
+const CHART_SECONDARY = 'hsl(var(--chart-secondary))';
+
 export default function SensorDetails() {
   const { sensorId } = useParams<{ sensorId: string }>();
   const navigate = useNavigate();
@@ -59,7 +58,6 @@ export default function SensorDetails() {
   const [timeRange, setTimeRange] = useState<TimeRange>('daily');
 
   const sensor = sensors.find((s) => s.sensor_code === sensorId || s.id === sensorId);
-
   const mockData = useMemo(() => generateMockData(sensorId || 'default', timeRange), [sensorId, timeRange]);
   const metrics = useMemo(() => computeMetrics(mockData), [mockData]);
   const prevMetrics = useMemo(() => {
@@ -71,9 +69,13 @@ export default function SensorDetails() {
   const totalPct = pctChange(metrics.total, prevMetrics.total);
   const labels = timeRangeLabels[timeRange];
 
+  const tickStyle = { fill: CHART_LABEL_COLOR, fontSize: 12, fontWeight: 500 };
+  const tooltipStyle = { borderRadius: '8px', border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' };
+
   if (isLoading) {
     return (
       <AppLayout>
+        <WaterAnalyticsBackground />
         <div className="p-6 md:p-10 max-w-6xl mx-auto space-y-6">
           <Skeleton className="h-8 w-40" />
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -88,12 +90,11 @@ export default function SensorDetails() {
   if (!sensor) {
     return (
       <AppLayout>
+        <WaterAnalyticsBackground />
         <div className="p-6 md:p-10 max-w-5xl mx-auto text-center space-y-4">
           <h1 className="text-2xl font-bold text-foreground">Sensor Not Found</h1>
           <p className="text-muted-foreground">The sensor "{sensorId}" could not be found.</p>
-          <Button variant="outline" onClick={() => navigate('/sensors')}>
-            <ArrowLeft className="h-4 w-4 mr-2" /> Back to Sensors
-          </Button>
+          <Button variant="outline" onClick={() => navigate('/sensors')}><ArrowLeft className="h-4 w-4 mr-2" /> Back to Sensors</Button>
         </div>
       </AppLayout>
     );
@@ -112,8 +113,8 @@ export default function SensorDetails() {
 
   return (
     <AppLayout>
-      <div className="p-6 md:p-10 max-w-6xl mx-auto space-y-8">
-        {/* Back */}
+      <WaterAnalyticsBackground />
+      <div className="relative p-6 md:p-10 max-w-6xl mx-auto space-y-8">
         <Button variant="ghost" className="gap-2 -ml-2 text-muted-foreground hover:text-foreground" onClick={() => navigate('/sensors')}>
           <ArrowLeft className="h-4 w-4" /> Back to Sensors
         </Button>
@@ -137,43 +138,35 @@ export default function SensorDetails() {
 
         {/* Info Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Card className="hover-glow border border-border">
-            <CardContent className="flex items-center gap-3 p-5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10"><MapPin className="h-5 w-5 text-primary" /></div>
-              <div><p className="text-sm text-muted-foreground">Location</p><p className="font-semibold text-foreground">{sensor.location}</p></div>
-            </CardContent>
-          </Card>
-          <Card className="hover-glow border border-border">
-            <CardContent className="flex items-center gap-3 p-5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10"><Droplets className="h-5 w-5 text-primary" /></div>
-              <div><p className="text-sm text-muted-foreground">Today's Usage</p><p className="font-semibold text-foreground">{sensor.today_usage} L</p></div>
-            </CardContent>
-          </Card>
-          <Card className="hover-glow border border-border">
-            <CardContent className="flex items-center gap-3 p-5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10"><Clock className="h-5 w-5 text-primary" /></div>
-              <div><p className="text-sm text-muted-foreground">Last Updated</p><p className="font-semibold text-foreground">{formatTs(sensor.last_updated)}</p></div>
-            </CardContent>
-          </Card>
+          {[
+            { icon: MapPin, label: 'Location', val: sensor.location },
+            { icon: Droplets, label: "Today's Usage", val: `${sensor.today_usage} L` },
+            { icon: Clock, label: 'Last Updated', val: formatTs(sensor.last_updated) },
+          ].map((c) => (
+            <Card key={c.label} className="hover-glow border border-border bg-card shadow-sm">
+              <CardContent className="flex items-center gap-3 p-5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/12"><c.icon className="h-5 w-5 text-primary" /></div>
+                <div><p className="text-sm text-muted-foreground">{c.label}</p><p className="font-semibold text-foreground">{c.val}</p></div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Time Range Filter */}
         <div className="flex items-center gap-2">
           {(['daily', 'weekly', 'monthly'] as TimeRange[]).map((r) => (
-            <Button key={r} size="sm" variant={timeRange === r ? 'default' : 'outline'} onClick={() => setTimeRange(r)} className="capitalize">
-              {r}
-            </Button>
+            <Button key={r} size="sm" variant={timeRange === r ? 'default' : 'outline'} onClick={() => setTimeRange(r)} className="capitalize">{r}</Button>
           ))}
         </div>
 
         {/* Metric Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {metricCards.map((m) => (
-            <Card key={m.title} className="card-3d border border-border">
+            <Card key={m.title} className="card-3d border border-border bg-card shadow-sm">
               <CardContent className="p-4 space-y-1">
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-muted-foreground">{m.title}</p>
-                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10"><m.icon className="h-3.5 w-3.5 text-primary" /></div>
+                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/12"><m.icon className="h-3.5 w-3.5 text-primary" /></div>
                 </div>
                 <p className="text-xl font-bold text-foreground">{m.value}</p>
                 {m.change !== null && (
@@ -187,52 +180,46 @@ export default function SensorDetails() {
         </div>
 
         {/* Usage Trend Line Chart */}
-        <Card className="border border-border">
+        <Card className="border border-border bg-card shadow-md">
           <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-primary" /> Usage Trend — {labels.current}
-            </CardTitle>
+            <CardTitle className="text-base flex items-center gap-2"><TrendingUp className="h-5 w-5 text-primary" /> Usage Trend — {labels.current}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={260}>
               <LineChart data={mockData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="label" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                <YAxis unit=" L" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }} />
-                <Line type="monotone" dataKey="current" name={labels.current} stroke="hsl(var(--primary))" strokeWidth={2.5} dot={{ r: 4, fill: 'hsl(var(--primary))' }} activeDot={{ r: 6, strokeWidth: 2 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} />
+                <XAxis dataKey="label" tick={tickStyle} />
+                <YAxis unit=" L" tick={tickStyle} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Line type="monotone" dataKey="current" name={labels.current} stroke={CHART_PRIMARY} strokeWidth={2.5} dot={{ r: 4, fill: CHART_PRIMARY }} activeDot={{ r: 6, strokeWidth: 2 }} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
         {/* Usage Distribution Bar Chart */}
-        <Card className="border border-border">
+        <Card className="border border-border bg-card shadow-md">
           <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-primary" /> Usage Distribution
-            </CardTitle>
+            <CardTitle className="text-base flex items-center gap-2"><BarChart3 className="h-5 w-5 text-primary" /> Usage Distribution</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={mockData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="label" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                <YAxis unit=" L" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }} />
-                <Bar dataKey="current" name={labels.current} fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} />
+                <XAxis dataKey="label" tick={tickStyle} />
+                <YAxis unit=" L" tick={tickStyle} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Bar dataKey="current" name={labels.current} fill={CHART_PRIMARY} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
         {/* Comparison Chart */}
-        <Card className="border border-border">
+        <Card className="border border-border bg-card shadow-md">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Activity className="h-5 w-5 text-primary" /> {labels.current} vs {labels.previous}
-              </CardTitle>
+              <CardTitle className="text-base flex items-center gap-2"><Activity className="h-5 w-5 text-primary" /> {labels.current} vs {labels.previous}</CardTitle>
               <Badge variant="outline" className={`text-xs ${totalPct >= 0 ? 'border-destructive/30 text-destructive' : 'border-accent/30 text-accent'}`}>
                 {totalPct >= 0 ? '↑' : '↓'} {Math.abs(totalPct)}% overall
               </Badge>
@@ -241,20 +228,20 @@ export default function SensorDetails() {
           <CardContent>
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={mockData} barGap={4}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="label" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                <YAxis unit=" L" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }} />
-                <Legend />
-                <Bar dataKey="current" name={labels.current} fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="previous" name={labels.previous} fill="hsl(var(--primary) / 0.3)" radius={[4, 4, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} />
+                <XAxis dataKey="label" tick={tickStyle} />
+                <YAxis unit=" L" tick={tickStyle} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Legend wrapperStyle={{ fontSize: 13, fontWeight: 500, color: CHART_LABEL_COLOR }} />
+                <Bar dataKey="current" name={labels.current} fill={CHART_PRIMARY} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="previous" name={labels.previous} fill={CHART_SECONDARY} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Per-period Comparison Summary */}
-        <Card className="border border-border">
+        {/* Period Comparison Summary */}
+        <Card className="border border-border bg-card shadow-md">
           <CardHeader>
             <CardTitle className="text-base">Period Comparison Summary</CardTitle>
           </CardHeader>

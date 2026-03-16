@@ -49,7 +49,7 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent><div className="text-2xl font-bold">{sensors.length}</div><p className="text-xs text-muted-foreground">{connectedCount} connected</p></CardContent>
               </Card>
-              <Card className="hover-glow">
+              <Card className="hover-glow bg-card shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Online Rate</CardTitle>
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10"><Wifi className="h-4 w-4 text-primary" /></div>
