@@ -18,6 +18,7 @@ export default function Dashboard() {
   return (
     <AppLayout>
       <WaterAnalyticsBackground />
+      <div className="container py-8 relative">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">
             Welcome back, {profile?.username}! 👋
@@ -38,27 +39,27 @@ export default function Dashboard() {
               <Card className="hover-glow bg-card shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Usage Today</CardTitle>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10"><Droplets className="h-4 w-4 text-primary" /></div>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/12"><Droplets className="h-4 w-4 text-primary" /></div>
                 </CardHeader>
                 <CardContent><div className="text-2xl font-bold">{totalUsage} L</div><p className="text-xs text-muted-foreground">Across all sensors</p></CardContent>
               </Card>
               <Card className="hover-glow bg-card shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Sensors</CardTitle>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10"><BarChart3 className="h-4 w-4 text-primary" /></div>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/12"><BarChart3 className="h-4 w-4 text-primary" /></div>
                 </CardHeader>
                 <CardContent><div className="text-2xl font-bold">{sensors.length}</div><p className="text-xs text-muted-foreground">{connectedCount} connected</p></CardContent>
               </Card>
               <Card className="hover-glow bg-card shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Online Rate</CardTitle>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10"><Wifi className="h-4 w-4 text-primary" /></div>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/12"><Wifi className="h-4 w-4 text-primary" /></div>
                 </CardHeader>
                 <CardContent><div className="text-2xl font-bold">{sensors.length > 0 ? Math.round((connectedCount / sensors.length) * 100) : 0}%</div><p className="text-xs text-muted-foreground">Sensors online</p></CardContent>
               </Card>
             </div>
 
-            <Card>
+            <Card className="bg-card shadow-sm">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2"><TrendingUp className="h-5 w-5 text-primary" /> Sensor Usage Breakdown</CardTitle>
               </CardHeader>
@@ -71,10 +72,10 @@ export default function Dashboard() {
                       <div
                         key={s.id}
                         onClick={() => navigate(`/sensors/${s.sensor_code}`)}
-                        className="flex items-center justify-between rounded-lg border p-3 card-3d"
+                        className="flex items-center justify-between rounded-lg border p-3 card-3d bg-card"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10"><Droplets className="h-4 w-4 text-primary" /></div>
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/12"><Droplets className="h-4 w-4 text-primary" /></div>
                           <div>
                             <p className="font-medium text-foreground text-sm">{s.sensor_name}</p>
                             <p className="text-xs text-muted-foreground">{s.location} · {s.sensor_code}</p>
