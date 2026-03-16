@@ -2,101 +2,101 @@
 @tailwind components;
 @tailwind utilities;
 
-/* AquaTrack Design System - Blue & Aqua Water Theme */
+/* AquaTrack Design System - Dark Turquoise Water Theme */
 
 @layer base {
   :root {
-    --background: 200 20% 98%;
-    --foreground: 210 40% 15%;
+    --background: 180 15% 98%;
+    --foreground: 190 40% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 40% 15%;
+    --card-foreground: 190 40% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 40% 15%;
+    --popover-foreground: 190 40% 15%;
 
-    --primary: 199 89% 48%;
+    --primary: 181 100% 41%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 187 71% 92%;
-    --secondary-foreground: 199 89% 30%;
+    --secondary: 180 60% 92%;
+    --secondary-foreground: 181 100% 25%;
 
-    --muted: 200 20% 94%;
-    --muted-foreground: 210 15% 45%;
+    --muted: 180 15% 94%;
+    --muted-foreground: 190 15% 45%;
 
-    --accent: 174 72% 46%;
+    --accent: 174 72% 40%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 200 20% 88%;
-    --input: 200 20% 88%;
-    --ring: 199 89% 48%;
+    --border: 180 15% 88%;
+    --input: 180 15% 88%;
+    --ring: 181 100% 41%;
 
     --radius: 0.5rem;
 
     /* Custom AquaTrack tokens */
-    --aqua: 187 71% 50%;
+    --aqua: 181 100% 41%;
     --aqua-foreground: 0 0% 100%;
-    --aqua-light: 187 71% 92%;
-    --aqua-dark: 199 89% 30%;
+    --aqua-light: 180 60% 92%;
+    --aqua-dark: 181 100% 25%;
     
-    --water-gradient-start: 199 89% 48%;
-    --water-gradient-end: 174 72% 46%;
+    --water-gradient-start: 181 100% 41%;
+    --water-gradient-end: 174 72% 40%;
 
-    --sidebar-background: 200 25% 97%;
-    --sidebar-foreground: 210 40% 15%;
-    --sidebar-primary: 199 89% 48%;
+    --sidebar-background: 180 20% 97%;
+    --sidebar-foreground: 190 40% 15%;
+    --sidebar-primary: 181 100% 41%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 187 71% 92%;
-    --sidebar-accent-foreground: 199 89% 30%;
-    --sidebar-border: 200 20% 88%;
-    --sidebar-ring: 199 89% 48%;
+    --sidebar-accent: 180 60% 92%;
+    --sidebar-accent-foreground: 181 100% 25%;
+    --sidebar-border: 180 15% 88%;
+    --sidebar-ring: 181 100% 41%;
   }
 
   .dark {
-    --background: 210 40% 8%;
-    --foreground: 200 20% 95%;
+    --background: 190 40% 8%;
+    --foreground: 180 15% 95%;
 
-    --card: 210 40% 12%;
-    --card-foreground: 200 20% 95%;
+    --card: 190 40% 12%;
+    --card-foreground: 180 15% 95%;
 
-    --popover: 210 40% 12%;
-    --popover-foreground: 200 20% 95%;
+    --popover: 190 40% 12%;
+    --popover-foreground: 180 15% 95%;
 
-    --primary: 199 89% 55%;
-    --primary-foreground: 210 40% 8%;
+    --primary: 181 100% 45%;
+    --primary-foreground: 190 40% 8%;
 
-    --secondary: 199 40% 20%;
-    --secondary-foreground: 199 89% 70%;
+    --secondary: 181 40% 20%;
+    --secondary-foreground: 181 100% 70%;
 
-    --muted: 210 30% 18%;
-    --muted-foreground: 200 15% 60%;
+    --muted: 190 30% 18%;
+    --muted-foreground: 180 15% 60%;
 
-    --accent: 174 72% 40%;
+    --accent: 174 72% 35%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 30% 22%;
-    --input: 210 30% 22%;
-    --ring: 199 89% 55%;
+    --border: 190 30% 22%;
+    --input: 190 30% 22%;
+    --ring: 181 100% 45%;
 
-    --aqua: 187 71% 45%;
+    --aqua: 181 100% 38%;
     --aqua-foreground: 0 0% 100%;
-    --aqua-light: 199 40% 20%;
-    --aqua-dark: 199 89% 70%;
+    --aqua-light: 181 40% 20%;
+    --aqua-dark: 181 100% 70%;
     
-    --sidebar-background: 210 40% 10%;
-    --sidebar-foreground: 200 20% 95%;
-    --sidebar-primary: 199 89% 55%;
-    --sidebar-primary-foreground: 210 40% 8%;
-    --sidebar-accent: 199 40% 20%;
-    --sidebar-accent-foreground: 199 89% 70%;
-    --sidebar-border: 210 30% 22%;
-    --sidebar-ring: 199 89% 55%;
+    --sidebar-background: 190 40% 10%;
+    --sidebar-foreground: 180 15% 95%;
+    --sidebar-primary: 181 100% 45%;
+    --sidebar-primary-foreground: 190 40% 8%;
+    --sidebar-accent: 181 40% 20%;
+    --sidebar-accent-foreground: 181 100% 70%;
+    --sidebar-border: 190 30% 22%;
+    --sidebar-ring: 181 100% 45%;
   }
 }
 
@@ -121,10 +121,30 @@
   }
 
   .hover-lift:hover {
-    transform: perspective(800px) translateY(-4px) rotateX(1.5deg);
+    transform: perspective(800px) translateY(-6px) rotateX(1.5deg);
     box-shadow:
-      0 8px 24px hsl(var(--primary) / 0.12),
-      0 2px 8px hsl(var(--primary) / 0.08);
+      0 12px 32px hsl(var(--primary) / 0.15),
+      0 4px 12px hsl(var(--primary) / 0.10);
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.2), 0 4px 16px hsl(var(--primary) / 0.12);
+  }
+
+  .card-3d {
+    @apply transition-all duration-300 cursor-pointer;
+    transform: perspective(600px) translateY(0) scale(1);
+  }
+
+  .card-3d:hover {
+    transform: perspective(600px) translateY(-5px) scale(1.01);
+    box-shadow:
+      0 16px 40px hsl(var(--primary) / 0.12),
+      0 4px 12px hsl(var(--primary) / 0.08);
   }
 }
 
