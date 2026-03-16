@@ -91,6 +91,9 @@
     --aqua-foreground: 0 0% 100%;
     --aqua-light: 181 40% 20%;
     --aqua-dark: 181 100% 70%;
+    --chart-label: 215 20% 65%;
+    --chart-grid: 215 20% 25%;
+    --chart-secondary: 181 40% 35%;
     
     --sidebar-background: 190 40% 10%;
     --sidebar-foreground: 180 15% 95%;
