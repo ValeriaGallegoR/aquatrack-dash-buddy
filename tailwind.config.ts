@@ -53,6 +53,11 @@ export default {
           light: "hsl(var(--aqua-light))",
           dark: "hsl(var(--aqua-dark))",
         },
+        chart: {
+          label: "hsl(var(--chart-label))",
+          grid: "hsl(var(--chart-grid))",
+          secondary: "hsl(var(--chart-secondary))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

@@ -41,6 +41,9 @@
     --aqua-foreground: 0 0% 100%;
     --aqua-light: 180 60% 92%;
     --aqua-dark: 181 100% 25%;
+    --chart-label: 215 25% 27%;
+    --chart-grid: 214 32% 91%;
+    --chart-secondary: 180 52% 76%;
     
     --water-gradient-start: 181 100% 41%;
     --water-gradient-end: 174 72% 40%;
@@ -88,6 +91,9 @@
     --aqua-foreground: 0 0% 100%;
     --aqua-light: 181 40% 20%;
     --aqua-dark: 181 100% 70%;
+    --chart-label: 215 20% 65%;
+    --chart-grid: 215 20% 25%;
+    --chart-secondary: 181 40% 35%;
     
     --sidebar-background: 190 40% 10%;
     --sidebar-foreground: 180 15% 95%;
