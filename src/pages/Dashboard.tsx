@@ -35,7 +35,7 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
-              <Card className="hover-glow">
+              <Card className="hover-glow bg-card shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Usage Today</CardTitle>
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10"><Droplets className="h-4 w-4 text-primary" /></div>
