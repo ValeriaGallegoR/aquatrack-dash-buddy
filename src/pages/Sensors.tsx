@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2, Wifi, WifiOff, Activity, Loader2 } from 'lucide-react';
+import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2, Wifi, WifiOff, Activity, Loader2, Link2, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSensors, Sensor } from '@/hooks/useSensors';
 import { formatDistanceToNow } from 'date-fns';
