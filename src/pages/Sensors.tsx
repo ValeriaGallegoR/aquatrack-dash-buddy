@@ -11,21 +11,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2, Wifi, WifiOff, Activity, Loader2 } from 'lucide-react';
+import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2, Wifi, WifiOff, Activity, Loader2, Link2, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSensors, Sensor } from '@/hooks/useSensors';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function Sensors() {
   const navigate = useNavigate();
-  const { sensors, isLoading, addSensor, removeSensor } = useSensors();
+  const { sensors, isLoading, addSensor, pairSensor, removeSensor } = useSensors();
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isPairOpen, setIsPairOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sensorToRemove, setSensorToRemove] = useState<Sensor | null>(null);
+  const [pairedResult, setPairedResult] = useState<{ sensorCode: string } | null>(null);
   const [newName, setNewName] = useState('');
   const [newSensorId, setNewSensorId] = useState('');
   const [newLocation, setNewLocation] = useState('');
   const [newStatus, setNewStatus] = useState<'connected' | 'disconnected'>('connected');
+  const [pairCode, setPairCode] = useState('');
 
   const handleRemove = async () => {
     if (!sensorToRemove) return;
@@ -49,6 +52,21 @@ export default function Sensors() {
     if (sensor) { toast.success(`Sensor "${sensor.sensor_name}" added.`); resetForm(); setIsAddOpen(false); }
   };
 
+  const handlePairSensor = async () => {
+    if (!pairCode.trim()) { toast.error('Please enter a Sensor ID.'); return; }
+    setIsSubmitting(true);
+    const result = await pairSensor(pairCode.trim());
+    setIsSubmitting(false);
+    if (result.success && result.sensor) {
+      setPairedResult({ sensorCode: result.sensor.sensor_code });
+      setPairCode('');
+      setIsPairOpen(false);
+      toast.success('Sensor paired successfully');
+    } else {
+      toast.error(result.error || 'Failed to pair sensor.');
+    }
+  };
+
   const formatLastUpdated = (ts: string) => {
     try { return formatDistanceToNow(new Date(ts), { addSuffix: true }); } catch { return 'Unknown'; }
   };
@@ -67,7 +85,10 @@ export default function Sensors() {
             </h1>
             <p className="text-muted-foreground mt-2 ml-[52px]">Manage and monitor your connected water sensors</p>
           </div>
-          <Button onClick={() => setIsAddOpen(true)} className="gap-2 self-start sm:self-auto"><Plus className="h-4 w-4" /> Add Sensor</Button>
+          <div className="flex gap-2 self-start sm:self-auto">
+            <Button variant="outline" onClick={() => setIsPairOpen(true)} className="gap-2"><Link2 className="h-4 w-4" /> Pair Sensor</Button>
+            <Button onClick={() => setIsAddOpen(true)} className="gap-2"><Plus className="h-4 w-4" /> Add Sensor</Button>
+          </div>
         </div>
 
         {sensors.length > 0 && (
@@ -177,6 +198,42 @@ export default function Sensors() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Pair Sensor Dialog */}
+        <Dialog open={isPairOpen} onOpenChange={(o) => { setIsPairOpen(o); if (!o) setPairCode(''); }}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Pair Existing Sensor</DialogTitle>
+              <DialogDescription>Enter the Sensor ID printed on your device to link it to your account.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <Label htmlFor="pair-code">Sensor ID</Label>
+                <Input id="pair-code" placeholder="e.g. AQ-101" value={pairCode} onChange={(e) => setPairCode(e.target.value)} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => { setPairCode(''); setIsPairOpen(false); }}>Cancel</Button>
+              <Button onClick={handlePairSensor} disabled={isSubmitting}>{isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Pair Sensor</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Pair Success Dialog */}
+        <Dialog open={!!pairedResult} onOpenChange={(o) => { if (!o) setPairedResult(null); }}>
+          <DialogContent className="sm:max-w-sm">
+            <div className="flex flex-col items-center text-center py-4 space-y-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+                <CheckCircle2 className="h-7 w-7 text-primary" />
+              </div>
+              <DialogTitle>Sensor paired successfully</DialogTitle>
+              <DialogDescription>
+                Sensor <span className="font-mono font-semibold text-foreground">{pairedResult?.sensorCode}</span> is now linked to your account.
+              </DialogDescription>
+              <Button onClick={() => setPairedResult(null)} className="w-full">Done</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppLayout>
   );

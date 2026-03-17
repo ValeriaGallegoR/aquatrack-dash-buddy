@@ -46,6 +46,35 @@ export function useSensors() {
     return data as Sensor;
   };
 
+  const pairSensor = async (sensorCode: string): Promise<{ success: boolean; sensor?: Sensor; error?: string }> => {
+    if (!user) return { success: false, error: 'Not authenticated.' };
+
+    // Find sensor by code
+    const { data: existing, error: fetchError } = await supabase
+      .from('sensors')
+      .select('*')
+      .eq('sensor_code', sensorCode)
+      .maybeSingle();
+
+    if (fetchError) { console.error(fetchError); return { success: false, error: 'Failed to look up sensor.' }; }
+    if (!existing) return { success: false, error: 'Sensor ID not found. Please check the code and try again.' };
+    if (existing.user_id === user.id) return { success: false, error: 'This sensor is already paired to your account.' };
+    if (existing.user_id) return { success: false, error: 'This sensor is already paired with another user.' };
+
+    // Pair it
+    const { data: updated, error: updateError } = await supabase
+      .from('sensors')
+      .update({ user_id: user.id })
+      .eq('id', existing.id)
+      .select()
+      .single();
+
+    if (updateError) { console.error(updateError); return { success: false, error: 'Failed to pair sensor.' }; }
+    const paired = updated as Sensor;
+    setSensors((prev) => [...prev, paired]);
+    return { success: true, sensor: paired };
+  };
+
   const removeSensor = async (id: string) => {
     const { error } = await supabase.from('sensors').delete().eq('id', id);
     if (error) { toast.error('Failed to remove sensor.'); console.error(error); return false; }
@@ -53,5 +82,5 @@ export function useSensors() {
     return true;
   };
 
-  return { sensors, isLoading, addSensor, removeSensor, refetch: fetchSensors };
+  return { sensors, isLoading, addSensor, pairSensor, removeSensor, refetch: fetchSensors };
 }
