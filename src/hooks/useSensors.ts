@@ -82,5 +82,5 @@ export function useSensors() {
     return true;
   };
 
-  return { sensors, isLoading, addSensor, removeSensor, refetch: fetchSensors };
+  return { sensors, isLoading, addSensor, pairSensor, removeSensor, refetch: fetchSensors };
 }
