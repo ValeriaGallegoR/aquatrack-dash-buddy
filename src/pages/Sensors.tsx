@@ -198,6 +198,42 @@ export default function Sensors() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Pair Sensor Dialog */}
+        <Dialog open={isPairOpen} onOpenChange={(o) => { setIsPairOpen(o); if (!o) setPairCode(''); }}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Pair Existing Sensor</DialogTitle>
+              <DialogDescription>Enter the Sensor ID printed on your device to link it to your account.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <Label htmlFor="pair-code">Sensor ID</Label>
+                <Input id="pair-code" placeholder="e.g. AQ-101" value={pairCode} onChange={(e) => setPairCode(e.target.value)} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => { setPairCode(''); setIsPairOpen(false); }}>Cancel</Button>
+              <Button onClick={handlePairSensor} disabled={isSubmitting}>{isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Pair Sensor</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Pair Success Dialog */}
+        <Dialog open={!!pairedResult} onOpenChange={(o) => { if (!o) setPairedResult(null); }}>
+          <DialogContent className="sm:max-w-sm">
+            <div className="flex flex-col items-center text-center py-4 space-y-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+                <CheckCircle2 className="h-7 w-7 text-primary" />
+              </div>
+              <DialogTitle>Sensor paired successfully</DialogTitle>
+              <DialogDescription>
+                Sensor <span className="font-mono font-semibold text-foreground">{pairedResult?.sensorCode}</span> is now linked to your account.
+              </DialogDescription>
+              <Button onClick={() => setPairedResult(null)} className="w-full">Done</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppLayout>
   );
