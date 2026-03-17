@@ -18,14 +18,17 @@ import { formatDistanceToNow } from 'date-fns';
 
 export default function Sensors() {
   const navigate = useNavigate();
-  const { sensors, isLoading, addSensor, removeSensor } = useSensors();
+  const { sensors, isLoading, addSensor, pairSensor, removeSensor } = useSensors();
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isPairOpen, setIsPairOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sensorToRemove, setSensorToRemove] = useState<Sensor | null>(null);
+  const [pairedResult, setPairedResult] = useState<{ sensorCode: string } | null>(null);
   const [newName, setNewName] = useState('');
   const [newSensorId, setNewSensorId] = useState('');
   const [newLocation, setNewLocation] = useState('');
   const [newStatus, setNewStatus] = useState<'connected' | 'disconnected'>('connected');
+  const [pairCode, setPairCode] = useState('');
 
   const handleRemove = async () => {
     if (!sensorToRemove) return;
