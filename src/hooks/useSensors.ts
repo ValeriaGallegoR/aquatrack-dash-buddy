@@ -12,6 +12,7 @@ export interface Sensor {
   status: string;
   today_usage: number;
   last_updated: string;
+  outlet_type: string | null;
 }
 
 export function useSensors() {
