@@ -31,13 +31,14 @@ export function useSensors() {
 
   useEffect(() => { fetchSensors(); }, [fetchSensors]);
 
-  const addSensor = async (sensor: { sensor_name: string; sensor_code: string; location: string; status: string }) => {
+  const addSensor = async (sensor: { sensor_name: string; sensor_code: string; location: string; status: string; outlet_type?: string }) => {
     if (!user) return null;
     const { data, error } = await supabase.from('sensors').insert({
       sensor_name: sensor.sensor_name,
       sensor_code: sensor.sensor_code,
       location: sensor.location,
       status: sensor.status,
+      outlet_type: sensor.outlet_type || null,
       today_usage: 0,
       user_id: user.id,
     }).select().single();
