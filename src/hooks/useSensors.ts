@@ -12,6 +12,7 @@ export interface Sensor {
   status: string;
   today_usage: number;
   last_updated: string;
+  outlet_type: string | null;
 }
 
 export function useSensors() {
@@ -30,13 +31,14 @@ export function useSensors() {
 
   useEffect(() => { fetchSensors(); }, [fetchSensors]);
 
-  const addSensor = async (sensor: { sensor_name: string; sensor_code: string; location: string; status: string }) => {
+  const addSensor = async (sensor: { sensor_name: string; sensor_code: string; location: string; status: string; outlet_type?: string }) => {
     if (!user) return null;
     const { data, error } = await supabase.from('sensors').insert({
       sensor_name: sensor.sensor_name,
       sensor_code: sensor.sensor_code,
       location: sensor.location,
       status: sensor.status,
+      outlet_type: sensor.outlet_type || null,
       today_usage: 0,
       user_id: user.id,
     }).select().single();
@@ -82,5 +84,13 @@ export function useSensors() {
     return true;
   };
 
-  return { sensors, isLoading, addSensor, pairSensor, removeSensor, refetch: fetchSensors };
+  const updateSensor = async (id: string, updates: Partial<Pick<Sensor, 'outlet_type'>>) => {
+    const { data, error } = await supabase.from('sensors').update(updates).eq('id', id).select().single();
+    if (error) { toast.error('Failed to update sensor.'); console.error(error); return null; }
+    const updated = data as Sensor;
+    setSensors((prev) => prev.map((s) => s.id === id ? updated : s));
+    return updated;
+  };
+
+  return { sensors, isLoading, addSensor, pairSensor, removeSensor, updateSensor, refetch: fetchSensors };
 }

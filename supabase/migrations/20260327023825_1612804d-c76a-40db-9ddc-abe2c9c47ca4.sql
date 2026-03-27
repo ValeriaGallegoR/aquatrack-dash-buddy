@@ -1,0 +1,1 @@
+ALTER TABLE public.sensors ADD COLUMN outlet_type text DEFAULT NULL;

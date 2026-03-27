@@ -11,14 +11,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2, Wifi, WifiOff, Activity, Loader2, Link2, CheckCircle2 } from 'lucide-react';
+import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2, Wifi, WifiOff, Activity, Loader2, Link2, CheckCircle2, Filter, Pencil, ShowerHead } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSensors, Sensor } from '@/hooks/useSensors';
 import { formatDistanceToNow } from 'date-fns';
 
+const OUTLET_TYPES = ['Faucet', 'Dishwasher', 'Washing Machine', 'Shower', 'Toilet', 'Sink', 'Bathtub', 'Other'] as const;
+
 export default function Sensors() {
   const navigate = useNavigate();
-  const { sensors, isLoading, addSensor, pairSensor, removeSensor } = useSensors();
+  const { sensors, isLoading, addSensor, pairSensor, removeSensor, updateSensor } = useSensors();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isPairOpen, setIsPairOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,7 +30,13 @@ export default function Sensors() {
   const [newSensorId, setNewSensorId] = useState('');
   const [newLocation, setNewLocation] = useState('');
   const [newStatus, setNewStatus] = useState<'connected' | 'disconnected'>('connected');
+  const [newOutletType, setNewOutletType] = useState('');
   const [pairCode, setPairCode] = useState('');
+  const [outletFilter, setOutletFilter] = useState('all');
+
+  // Edit outlet type
+  const [editingSensor, setEditingSensor] = useState<Sensor | null>(null);
+  const [editOutletType, setEditOutletType] = useState('');
 
   const handleRemove = async () => {
     if (!sensorToRemove) return;
@@ -37,7 +45,7 @@ export default function Sensors() {
     setSensorToRemove(null);
   };
 
-  const resetForm = () => { setNewName(''); setNewSensorId(''); setNewLocation(''); setNewStatus('connected'); };
+  const resetForm = () => { setNewName(''); setNewSensorId(''); setNewLocation(''); setNewStatus('connected'); setNewOutletType(''); };
 
   const handleAddSensor = async () => {
     if (!newName.trim() || !newSensorId.trim() || !newLocation.trim()) { toast.error('Please fill in all fields.'); return; }
@@ -47,6 +55,7 @@ export default function Sensors() {
       sensor_code: newSensorId.trim(),
       location: newLocation.trim(),
       status: newStatus,
+      outlet_type: newOutletType || undefined,
     });
     setIsSubmitting(false);
     if (sensor) { toast.success(`Sensor "${sensor.sensor_name}" added.`); resetForm(); setIsAddOpen(false); }
@@ -67,12 +76,29 @@ export default function Sensors() {
     }
   };
 
+  const handleEditOutletType = async () => {
+    if (!editingSensor) return;
+    setIsSubmitting(true);
+    const updated = await updateSensor(editingSensor.id, { outlet_type: editOutletType || null });
+    setIsSubmitting(false);
+    if (updated) {
+      toast.success('Water Outlet Type updated.');
+      setEditingSensor(null);
+    }
+  };
+
   const formatLastUpdated = (ts: string) => {
     try { return formatDistanceToNow(new Date(ts), { addSuffix: true }); } catch { return 'Unknown'; }
   };
 
   const connectedCount = sensors.filter((s) => s.status === 'connected').length;
   const disconnectedCount = sensors.filter((s) => s.status === 'disconnected').length;
+
+  const filteredSensors = outletFilter === 'all'
+    ? sensors
+    : outletFilter === 'unassigned'
+      ? sensors.filter((s) => !s.outlet_type)
+      : sensors.filter((s) => s.outlet_type === outletFilter);
 
   return (
     <AppLayout>
@@ -92,15 +118,31 @@ export default function Sensors() {
         </div>
 
         {sensors.length > 0 && (
-          <div className="flex items-center gap-6 text-sm">
-            <div className="flex items-center gap-2 text-muted-foreground"><Activity className="h-4 w-4 text-primary" /><span className="font-semibold text-foreground">{sensors.length}</span> Total</div>
-            <Separator orientation="vertical" className="h-4" />
-            <div className="flex items-center gap-2 text-muted-foreground"><Wifi className="h-4 w-4 text-accent" /><span className="font-semibold text-foreground">{connectedCount}</span> Online</div>
-            <Separator orientation="vertical" className="h-4" />
-            <div className="flex items-center gap-2 text-muted-foreground"><WifiOff className="h-4 w-4 text-destructive/60" /><span className="font-semibold text-foreground">{disconnectedCount}</span> Offline</div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2 text-muted-foreground"><Activity className="h-4 w-4 text-primary" /><span className="font-semibold text-foreground">{sensors.length}</span> Total</div>
+              <Separator orientation="vertical" className="h-4" />
+              <div className="flex items-center gap-2 text-muted-foreground"><Wifi className="h-4 w-4 text-accent" /><span className="font-semibold text-foreground">{connectedCount}</span> Online</div>
+              <Separator orientation="vertical" className="h-4" />
+              <div className="flex items-center gap-2 text-muted-foreground"><WifiOff className="h-4 w-4 text-destructive/60" /><span className="font-semibold text-foreground">{disconnectedCount}</span> Offline</div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <Select value={outletFilter} onValueChange={setOutletFilter}>
+                <SelectTrigger className="w-[180px] h-9 text-sm">
+                  <SelectValue placeholder="Filter by outlet" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Outlet Types</SelectItem>
+                  <SelectItem value="unassigned">Unassigned</SelectItem>
+                  {OUTLET_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         )}
 
+        {/* Add Sensor Dialog */}
         <Dialog open={isAddOpen} onOpenChange={(o) => { setIsAddOpen(o); if (!o) resetForm(); }}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
@@ -111,6 +153,15 @@ export default function Sensors() {
               <div className="space-y-2"><Label htmlFor="sensor-name">Sensor Name</Label><Input id="sensor-name" placeholder="e.g. Kitchen Sink" value={newName} onChange={(e) => setNewName(e.target.value)} /></div>
               <div className="space-y-2"><Label htmlFor="sensor-id">Sensor ID</Label><Input id="sensor-id" placeholder="e.g. AQ-105" value={newSensorId} onChange={(e) => setNewSensorId(e.target.value)} /></div>
               <div className="space-y-2"><Label htmlFor="sensor-location">Location</Label><Input id="sensor-location" placeholder="e.g. Bathroom" value={newLocation} onChange={(e) => setNewLocation(e.target.value)} /></div>
+              <div className="space-y-2">
+                <Label>Water Outlet Type</Label>
+                <Select value={newOutletType} onValueChange={setNewOutletType}>
+                  <SelectTrigger><SelectValue placeholder="Select outlet type" /></SelectTrigger>
+                  <SelectContent>
+                    {OUTLET_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-2">
                 <Label>Status</Label>
                 <Select value={newStatus} onValueChange={(v) => setNewStatus(v as 'connected' | 'disconnected')}>
@@ -133,6 +184,14 @@ export default function Sensors() {
           <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {[1, 2, 3].map((i) => <Skeleton key={i} className="h-56 rounded-xl" />)}
           </div>
+        ) : filteredSensors.length === 0 && sensors.length > 0 ? (
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+              <Filter className="h-8 w-8 text-muted-foreground mb-4" />
+              <h2 className="text-lg font-semibold text-foreground mb-1">No sensors match this filter</h2>
+              <p className="text-muted-foreground text-sm">Try selecting a different outlet type or clear the filter.</p>
+            </CardContent>
+          </Card>
         ) : sensors.length === 0 ? (
           <Card className="border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-20 text-center">
@@ -144,7 +203,7 @@ export default function Sensors() {
           </Card>
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            {sensors.map((sensor, index) => (
+            {filteredSensors.map((sensor, index) => (
               <Card
                 key={sensor.id}
                 onClick={() => navigate(`/sensors/${sensor.sensor_code}`)}
@@ -174,6 +233,12 @@ export default function Sensors() {
                     <div className="flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="h-3.5 w-3.5 text-primary/70" /><span className="truncate">{sensor.location}</span></div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground"><Clock className="h-3.5 w-3.5 text-primary/70" /><span className="truncate">{formatLastUpdated(sensor.last_updated)}</span></div>
                   </div>
+                  {sensor.outlet_type && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <ShowerHead className="h-3.5 w-3.5 text-primary/70" />
+                      <span>{sensor.outlet_type}</span>
+                    </div>
+                  )}
                   <div className="flex items-baseline gap-1.5 rounded-lg bg-secondary/50 px-3 py-2.5">
                     <Droplets className="h-4 w-4 text-primary mt-0.5" />
                     <span className="text-2xl font-bold text-foreground tracking-tight">{sensor.today_usage}</span>
@@ -181,7 +246,8 @@ export default function Sensors() {
                   </div>
                   <div className="flex gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
                     <Button variant="outline" size="sm" className="flex-1 gap-1.5" onClick={() => navigate(`/sensors/${sensor.sensor_code}`)}><Eye className="h-3.5 w-3.5" /> Details</Button>
-                    <Button variant="outline" size="sm" className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setSensorToRemove(sensor)}><Trash2 className="h-3.5 w-3.5" /> Remove</Button>
+                    <Button variant="outline" size="sm" className="gap-1.5" onClick={() => { setEditingSensor(sensor); setEditOutletType(sensor.outlet_type || ''); }}><Pencil className="h-3.5 w-3.5" /></Button>
+                    <Button variant="outline" size="sm" className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setSensorToRemove(sensor)}><Trash2 className="h-3.5 w-3.5" /></Button>
                   </div>
                 </CardContent>
               </Card>
@@ -232,6 +298,31 @@ export default function Sensors() {
               </DialogDescription>
               <Button onClick={() => setPairedResult(null)} className="w-full">Done</Button>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Outlet Type Dialog */}
+        <Dialog open={!!editingSensor} onOpenChange={(o) => { if (!o) setEditingSensor(null); }}>
+          <DialogContent className="sm:max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Edit Water Outlet Type</DialogTitle>
+              <DialogDescription>Update the outlet type for <span className="font-semibold text-foreground">{editingSensor?.sensor_name}</span>.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <Label>Water Outlet Type</Label>
+                <Select value={editOutletType} onValueChange={setEditOutletType}>
+                  <SelectTrigger><SelectValue placeholder="Select outlet type" /></SelectTrigger>
+                  <SelectContent>
+                    {OUTLET_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditingSensor(null)}>Cancel</Button>
+              <Button onClick={handleEditOutletType} disabled={isSubmitting}>{isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Save</Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
