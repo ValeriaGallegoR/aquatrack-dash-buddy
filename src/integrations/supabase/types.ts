@@ -110,6 +110,7 @@ export type Database = {
           id: string
           last_updated: string
           location: string
+          outlet_type: string | null
           sensor_code: string
           sensor_name: string
           status: string
@@ -120,6 +121,7 @@ export type Database = {
           id?: string
           last_updated?: string
           location: string
+          outlet_type?: string | null
           sensor_code: string
           sensor_name: string
           status?: string
@@ -130,6 +132,7 @@ export type Database = {
           id?: string
           last_updated?: string
           location?: string
+          outlet_type?: string | null
           sensor_code?: string
           sensor_name?: string
           status?: string
