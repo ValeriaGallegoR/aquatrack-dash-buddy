@@ -84,5 +84,13 @@ export function useSensors() {
     return true;
   };
 
-  return { sensors, isLoading, addSensor, pairSensor, removeSensor, refetch: fetchSensors };
+  const updateSensor = async (id: string, updates: Partial<Pick<Sensor, 'outlet_type'>>) => {
+    const { data, error } = await supabase.from('sensors').update(updates).eq('id', id).select().single();
+    if (error) { toast.error('Failed to update sensor.'); console.error(error); return null; }
+    const updated = data as Sensor;
+    setSensors((prev) => prev.map((s) => s.id === id ? updated : s));
+    return updated;
+  };
+
+  return { sensors, isLoading, addSensor, pairSensor, removeSensor, updateSensor, refetch: fetchSensors };
 }
