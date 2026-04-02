@@ -61,20 +61,7 @@ export default function Sensors() {
     if (sensor) { toast.success(`Sensor "${sensor.sensor_name}" added.`); resetForm(); setIsAddOpen(false); }
   };
 
-  const handlePairSensor = async () => {
-    if (!pairCode.trim()) { toast.error('Please enter a Sensor ID.'); return; }
-    setIsSubmitting(true);
-    const result = await pairSensor(pairCode.trim());
-    setIsSubmitting(false);
-    if (result.success && result.sensor) {
-      setPairedResult({ sensorCode: result.sensor.sensor_code });
-      setPairCode('');
-      setIsPairOpen(false);
-      toast.success('Sensor paired successfully');
-    } else {
-      toast.error(result.error || 'Failed to pair sensor.');
-    }
-  };
+
 
   const handleEditOutletType = async () => {
     if (!editingSensor) return;
