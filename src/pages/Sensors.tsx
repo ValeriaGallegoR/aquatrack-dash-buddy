@@ -99,7 +99,6 @@ export default function Sensors() {
             <p className="text-muted-foreground mt-2 ml-[52px]">Manage and monitor your connected water sensors</p>
           </div>
           <div className="flex gap-2 self-start sm:self-auto">
-            <Button variant="outline" onClick={() => setIsPairOpen(true)} className="gap-2"><Link2 className="h-4 w-4" /> Pair Sensor</Button>
             <Button onClick={() => setIsAddOpen(true)} className="gap-2"><Plus className="h-4 w-4" /> Add Sensor</Button>
           </div>
         </div>
