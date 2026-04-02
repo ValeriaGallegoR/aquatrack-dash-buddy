@@ -31,7 +31,7 @@ export default function Sensors() {
   const [newLocation, setNewLocation] = useState('');
   const [newStatus, setNewStatus] = useState<'connected' | 'disconnected'>('connected');
   const [newOutletType, setNewOutletType] = useState('');
-  const [pairCode, setPairCode] = useState('');
+  
   const [outletFilter, setOutletFilter] = useState('all');
 
   // Edit outlet type
