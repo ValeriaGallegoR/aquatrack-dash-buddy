@@ -22,7 +22,7 @@ export default function Sensors() {
   const navigate = useNavigate();
   const { sensors, isLoading, addSensor, pairSensor, removeSensor, updateSensor } = useSensors();
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [isPairOpen, setIsPairOpen] = useState(false);
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sensorToRemove, setSensorToRemove] = useState<Sensor | null>(null);
   const [pairedResult, setPairedResult] = useState<{ sensorCode: string } | null>(null);
