@@ -25,7 +25,7 @@ export default function Sensors() {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sensorToRemove, setSensorToRemove] = useState<Sensor | null>(null);
-  const [pairedResult, setPairedResult] = useState<{ sensorCode: string } | null>(null);
+  
   const [newName, setNewName] = useState('');
   const [newSensorId, setNewSensorId] = useState('');
   const [newLocation, setNewLocation] = useState('');
