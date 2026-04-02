@@ -20,7 +20,7 @@ const OUTLET_TYPES = ['Faucet', 'Dishwasher', 'Washing Machine', 'Shower', 'Toil
 
 export default function Sensors() {
   const navigate = useNavigate();
-  const { sensors, isLoading, addSensor, pairSensor, removeSensor, updateSensor } = useSensors();
+  const { sensors, isLoading, addSensor, removeSensor, updateSensor } = useSensors();
   const [isAddOpen, setIsAddOpen] = useState(false);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
