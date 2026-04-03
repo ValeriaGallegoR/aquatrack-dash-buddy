@@ -11,6 +11,7 @@ import { Droplets, TrendingUp, BarChart3, Wifi, Home } from 'lucide-react';
 export default function Dashboard() {
   const { profile } = useAuth();
   const { sensors, isLoading } = useSensors();
+  const { groups, isLoading: groupsLoading } = useRoomGroups();
   const navigate = useNavigate();
 
   const totalUsage = sensors.reduce((sum, s) => sum + s.today_usage, 0);
