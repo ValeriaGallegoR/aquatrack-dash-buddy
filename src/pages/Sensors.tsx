@@ -257,6 +257,17 @@ export default function Sensors() {
 
 
 
+        {/* Room Groups Section */}
+        <RoomGroupsManager
+          groups={groups}
+          sensors={sensors}
+          onAddGroup={addGroup}
+          onRenameGroup={renameGroup}
+          onDeleteGroup={deleteGroup}
+          onAssignSensor={assignSensor}
+          onRefetchSensors={refetchSensors}
+        />
+
         {/* Edit Outlet Type Dialog */}
         <Dialog open={!!editingSensor} onOpenChange={(o) => { if (!o) setEditingSensor(null); }}>
           <DialogContent className="sm:max-w-sm">
