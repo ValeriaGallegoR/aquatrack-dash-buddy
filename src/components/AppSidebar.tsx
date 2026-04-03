@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LayoutDashboard, Radio, LogOut, Droplets, Bell, Users } from 'lucide-react';
+import { Home, LayoutDashboard, Radio, LogOut, Droplets, Bell, Users, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { NavLink } from '@/components/NavLink';
