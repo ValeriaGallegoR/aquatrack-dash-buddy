@@ -90,6 +90,35 @@ export default function Dashboard() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Room Groups Overview */}
+            {groups.length > 0 && (
+              <Card className="bg-card shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2"><Home className="h-5 w-5 text-primary" /> Room Groups</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {groups.map((g) => {
+                      const groupSensors = sensors.filter((s) => (s as any).room_group_id === g.id);
+                      const groupUsage = groupSensors.reduce((sum, s) => sum + s.today_usage, 0);
+                      return (
+                        <div key={g.id} className="rounded-lg border p-3 bg-secondary/30">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Home className="h-4 w-4 text-primary" />
+                            <p className="font-medium text-foreground text-sm">{g.name}</p>
+                          </div>
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>{groupSensors.length} sensor{groupSensors.length !== 1 ? 's' : ''}</span>
+                            <span className="font-semibold text-foreground">{groupUsage} L</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </>
         )}
       </div>
