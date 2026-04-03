@@ -14,13 +14,16 @@ import { Separator } from '@/components/ui/separator';
 import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2, Wifi, WifiOff, Activity, Loader2, Filter, Pencil, ShowerHead } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSensors, Sensor } from '@/hooks/useSensors';
+import { useRoomGroups } from '@/hooks/useRoomGroups';
+import RoomGroupsManager from '@/components/RoomGroupsManager';
 import { formatDistanceToNow } from 'date-fns';
 
 const OUTLET_TYPES = ['Faucet', 'Dishwasher', 'Washing Machine', 'Shower', 'Toilet', 'Sink', 'Bathtub', 'Other'] as const;
 
 export default function Sensors() {
   const navigate = useNavigate();
-  const { sensors, isLoading, addSensor, removeSensor, updateSensor } = useSensors();
+  const { sensors, isLoading, addSensor, removeSensor, updateSensor, refetch: refetchSensors } = useSensors();
+  const { groups, addGroup, renameGroup, deleteGroup, assignSensor } = useRoomGroups();
   const [isAddOpen, setIsAddOpen] = useState(false);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -253,6 +256,17 @@ export default function Sensors() {
 
 
 
+
+        {/* Room Groups Section */}
+        <RoomGroupsManager
+          groups={groups}
+          sensors={sensors}
+          onAddGroup={addGroup}
+          onRenameGroup={renameGroup}
+          onDeleteGroup={deleteGroup}
+          onAssignSensor={assignSensor}
+          onRefetchSensors={refetchSensors}
+        />
 
         {/* Edit Outlet Type Dialog */}
         <Dialog open={!!editingSensor} onOpenChange={(o) => { if (!o) setEditingSensor(null); }}>

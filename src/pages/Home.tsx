@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSensors } from '@/hooks/useSensors';
 import { useAlerts } from '@/hooks/useAlerts';
-import { Droplets, LayoutDashboard, Radio, Bell, Wifi } from 'lucide-react';
+import { Droplets, LayoutDashboard, Radio, Bell, Wifi, BarChart3 } from 'lucide-react';
 import { useEffect } from 'react';
 
 export default function Home() {
@@ -54,6 +54,12 @@ export default function Home() {
             <CardContent className="flex items-center gap-4 p-6">
               <div className="rounded-lg bg-primary/10 p-3 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors"><Bell className="h-6 w-6" /></div>
               <div><p className="font-semibold text-foreground">Alerts</p><p className="text-sm text-muted-foreground">{unreadAlerts} unread notifications</p></div>
+            </CardContent>
+          </Card>
+          <Card className="cursor-pointer border border-primary/30 hover:border-primary hover:shadow-md transition-all group sm:col-span-3" onClick={() => navigate('/track-usage')}>
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="rounded-lg water-gradient p-3 text-primary-foreground"><BarChart3 className="h-6 w-6" /></div>
+              <div><p className="font-semibold text-foreground">Track Usage</p><p className="text-sm text-muted-foreground">View charts, graphs &amp; analytics of your water consumption</p></div>
             </CardContent>
           </Card>
         </div>

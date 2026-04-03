@@ -76,6 +76,27 @@ export type Database = {
         }
         Relationships: []
       }
+      room_groups: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sensor_readings: {
         Row: {
           id: string
@@ -111,6 +132,7 @@ export type Database = {
           last_updated: string
           location: string
           outlet_type: string | null
+          room_group_id: string | null
           sensor_code: string
           sensor_name: string
           status: string
@@ -122,6 +144,7 @@ export type Database = {
           last_updated?: string
           location: string
           outlet_type?: string | null
+          room_group_id?: string | null
           sensor_code: string
           sensor_name: string
           status?: string
@@ -133,13 +156,22 @@ export type Database = {
           last_updated?: string
           location?: string
           outlet_type?: string | null
+          room_group_id?: string | null
           sensor_code?: string
           sensor_name?: string
           status?: string
           today_usage?: number
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sensors_room_group_id_fkey"
+            columns: ["room_group_id"]
+            isOneToOne: false
+            referencedRelation: "room_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

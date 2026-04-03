@@ -13,6 +13,7 @@ export interface Sensor {
   today_usage: number;
   last_updated: string;
   outlet_type: string | null;
+  room_group_id: string | null;
 }
 
 export function useSensors() {

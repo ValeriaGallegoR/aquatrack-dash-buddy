@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LayoutDashboard, Radio, LogOut, Droplets, Bell, Users } from 'lucide-react';
+import { Home, LayoutDashboard, Radio, LogOut, Droplets, Bell, Users, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { NavLink } from '@/components/NavLink';
@@ -14,6 +14,7 @@ const userNavItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Sensors', url: '/sensors', icon: Radio },
   { title: 'Alerts', url: '/alerts', icon: Bell },
+  { title: 'Track Usage', url: '/track-usage', icon: BarChart3 },
 ];
 
 const adminNavItems = [
