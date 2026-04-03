@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSensors } from '@/hooks/useSensors';
 import { useAlerts } from '@/hooks/useAlerts';
-import { Droplets, LayoutDashboard, Radio, Bell, Wifi } from 'lucide-react';
+import { Droplets, LayoutDashboard, Radio, Bell, Wifi, BarChart3 } from 'lucide-react';
 import { useEffect } from 'react';
 
 export default function Home() {
