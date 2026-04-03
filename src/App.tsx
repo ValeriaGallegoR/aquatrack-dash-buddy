@@ -43,6 +43,7 @@ const App = () => (
             <Route path="/sensors" element={<ProtectedRoute><Sensors /></ProtectedRoute>} />
             <Route path="/sensors/:sensorId" element={<ProtectedRoute><SensorDetails /></ProtectedRoute>} />
             <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
+            <Route path="/track-usage" element={<ProtectedRoute><TrackUsage /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
