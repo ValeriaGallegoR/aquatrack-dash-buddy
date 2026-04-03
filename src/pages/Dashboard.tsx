@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSensors } from '@/hooks/useSensors';
-import { Droplets, TrendingUp, BarChart3, Wifi } from 'lucide-react';
+import { useRoomGroups } from '@/hooks/useRoomGroups';
+import { Droplets, TrendingUp, BarChart3, Wifi, Home } from 'lucide-react';
 
 export default function Dashboard() {
   const { profile } = useAuth();
