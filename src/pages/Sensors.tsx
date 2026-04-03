@@ -14,6 +14,8 @@ import { Separator } from '@/components/ui/separator';
 import { Plus, Radio, MapPin, Droplets, Clock, Eye, Trash2, Wifi, WifiOff, Activity, Loader2, Filter, Pencil, ShowerHead } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSensors, Sensor } from '@/hooks/useSensors';
+import { useRoomGroups } from '@/hooks/useRoomGroups';
+import RoomGroupsManager from '@/components/RoomGroupsManager';
 import { formatDistanceToNow } from 'date-fns';
 
 const OUTLET_TYPES = ['Faucet', 'Dishwasher', 'Washing Machine', 'Shower', 'Toilet', 'Sink', 'Bathtub', 'Other'] as const;
