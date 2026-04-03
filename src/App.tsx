@@ -18,6 +18,7 @@ import Sensors from "./pages/Sensors";
 import SensorDetails from "./pages/SensorDetails";
 import Alerts from "./pages/Alerts";
 import Admin from "./pages/Admin";
+import TrackUsage from "./pages/TrackUsage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
