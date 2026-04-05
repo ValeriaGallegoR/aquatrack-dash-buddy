@@ -41,6 +41,7 @@ export default function TrackUsage() {
   const [timeRange, setTimeRange] = useState<TimeRange>('daily');
   const [readings, setReadings] = useState<any[]>([]);
   const [readingsLoading, setReadingsLoading] = useState(true);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const hasSensors = sensors.length > 0;
 
