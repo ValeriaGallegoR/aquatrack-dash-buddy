@@ -377,6 +377,36 @@ export default function TrackUsage() {
           </>
         )}
       </div>
+
+      <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileDown className="h-5 w-5 text-primary" />
+              Generate Report
+            </DialogTitle>
+            <DialogDescription>
+              Create a downloadable report based on your current usage data and selected time range.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="rounded-lg border p-4 bg-secondary/30 space-y-2">
+              <p className="text-sm font-medium text-foreground">Report Summary</p>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Time range: <span className="font-medium text-foreground capitalize">{timeRange}</span></li>
+                <li>• Total usage: <span className="font-medium text-foreground">{totalUsage} L</span></li>
+                <li>• Average: <span className="font-medium text-foreground">{avgUsage} L</span></li>
+                <li>• Sensors: <span className="font-medium text-foreground">{sensors.length}</span></li>
+                <li>• Data source: <span className="font-medium text-foreground">{isUsingMock ? 'Sample data' : 'Live sensors'}</span></li>
+              </ul>
+            </div>
+            <Button className="w-full gap-2" onClick={() => setReportOpen(false)}>
+              <FileDown className="h-4 w-4" />
+              Download Report
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
