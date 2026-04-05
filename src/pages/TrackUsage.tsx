@@ -140,8 +140,15 @@ export default function TrackUsage() {
                   <p>View your water usage data across daily, weekly, and monthly timeframes. Connect sensors to see real data instead of samples.</p>
                 </TooltipContent>
               </Tooltip>
-            </div>
           </div>
+          <div className="flex flex-col items-end gap-1">
+            <Button onClick={() => setReportOpen(true)} className="gap-2">
+              <FileDown className="h-4 w-4" />
+              Generate Report
+            </Button>
+            <p className="text-xs text-muted-foreground">Download a detailed usage report based on current data</p>
+          </div>
+        </div>
         </div>
 
         {isUsingMock && !loading && (
