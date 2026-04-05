@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
 import { AppLayout } from '@/components/AppLayout';
 import WaterAnalyticsBackground from '@/components/WaterAnalyticsBackground';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -483,7 +484,12 @@ export default function TrackUsage() {
 
             {/* Actions */}
             <div className="flex gap-3 pt-2">
-              <Button className="flex-1 gap-2">
+              <Button className="flex-1 gap-2" onClick={() => {
+                import('@/lib/generateReport').then(({ downloadAquaTrackReport }) => {
+                  downloadAquaTrackReport();
+                  toast.success('Report downloaded successfully');
+                });
+              }}>
                 <FileDown className="h-4 w-4" />
                 Download PDF
               </Button>
