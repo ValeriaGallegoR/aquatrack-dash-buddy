@@ -11,7 +11,7 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as
 import { useSensors } from '@/hooks/useSensors';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Droplets, TrendingUp, BarChart3, Activity, Info, HelpCircle } from 'lucide-react';
+import { Droplets, TrendingUp, BarChart3, Activity, Info, HelpCircle, Clock, ArrowUpRight, Sun, Lightbulb } from 'lucide-react';
 
 type TimeRange = 'daily' | 'weekly' | 'monthly';
 
