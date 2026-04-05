@@ -11,7 +11,7 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as
 import { useSensors } from '@/hooks/useSensors';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Droplets, TrendingUp, BarChart3, Activity, Info, HelpCircle } from 'lucide-react';
+import { Droplets, TrendingUp, BarChart3, Activity, Info, HelpCircle, Clock, ArrowUpRight, Sun, Lightbulb } from 'lucide-react';
 
 type TimeRange = 'daily' | 'weekly' | 'monthly';
 
@@ -281,6 +281,90 @@ export default function TrackUsage() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Usage Insights Section */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
+                <Lightbulb className="h-5 w-5 text-primary" />
+                Usage Insights
+              </h2>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <Card className="hover-glow bg-card shadow-sm">
+                  <CardContent className="p-4 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-muted-foreground">Total Usage</p>
+                      <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/12">
+                        <Droplets className="h-3.5 w-3.5 text-primary" />
+                      </div>
+                    </div>
+                    <p className="text-2xl font-bold text-foreground">306 L</p>
+                    <p className="text-xs text-muted-foreground">This week</p>
+                  </CardContent>
+                </Card>
+                <Card className="hover-glow bg-card shadow-sm">
+                  <CardContent className="p-4 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-muted-foreground">Avg Daily Usage</p>
+                      <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/12">
+                        <Activity className="h-3.5 w-3.5 text-primary" />
+                      </div>
+                    </div>
+                    <p className="text-2xl font-bold text-foreground">18 L</p>
+                    <p className="text-xs text-muted-foreground">Per day</p>
+                  </CardContent>
+                </Card>
+                <Card className="hover-glow bg-card shadow-sm">
+                  <CardContent className="p-4 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-muted-foreground">Peak Usage Time</p>
+                      <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/12">
+                        <Clock className="h-3.5 w-3.5 text-primary" />
+                      </div>
+                    </div>
+                    <p className="text-2xl font-bold text-foreground">9–10 PM</p>
+                    <p className="text-xs text-muted-foreground">Evening hours</p>
+                  </CardContent>
+                </Card>
+                <Card className="hover-glow bg-card shadow-sm">
+                  <CardContent className="p-4 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-muted-foreground">Weekly Change</p>
+                      <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/12">
+                        <ArrowUpRight className="h-3.5 w-3.5 text-primary" />
+                      </div>
+                    </div>
+                    <p className="text-2xl font-bold text-foreground">+27%</p>
+                    <p className="text-xs text-muted-foreground">vs last week (240 L)</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card className="border border-border bg-card shadow-md">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Sun className="h-5 w-5 text-primary" /> Smart Insights
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    {[
+                      'Your water usage increased by 27% compared to last week.',
+                      'Peak usage occurs during evening hours (9–10 PM).',
+                      'Usage steadily increases throughout the day.',
+                      'Your highest consumption happens after 6 PM.',
+                    ].map((insight, i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm text-foreground">
+                        <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                          <Lightbulb className="h-3 w-3 text-primary" />
+                        </div>
+                        {insight}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
           </>
         )}
       </div>
