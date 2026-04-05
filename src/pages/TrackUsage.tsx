@@ -7,11 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend, AreaChart, Area } from 'recharts';
 import { useSensors } from '@/hooks/useSensors';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Droplets, TrendingUp, BarChart3, Activity, Info, HelpCircle, Clock, ArrowUpRight, Sun, Lightbulb } from 'lucide-react';
+import { Droplets, TrendingUp, BarChart3, Activity, Info, HelpCircle, Clock, ArrowUpRight, Sun, Lightbulb, FileDown } from 'lucide-react';
 
 type TimeRange = 'daily' | 'weekly' | 'monthly';
 
@@ -40,6 +41,7 @@ export default function TrackUsage() {
   const [timeRange, setTimeRange] = useState<TimeRange>('daily');
   const [readings, setReadings] = useState<any[]>([]);
   const [readingsLoading, setReadingsLoading] = useState(true);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const hasSensors = sensors.length > 0;
 
@@ -138,8 +140,15 @@ export default function TrackUsage() {
                   <p>View your water usage data across daily, weekly, and monthly timeframes. Connect sensors to see real data instead of samples.</p>
                 </TooltipContent>
               </Tooltip>
-            </div>
           </div>
+          <div className="flex flex-col items-end gap-1">
+            <Button onClick={() => setReportOpen(true)} className="gap-2">
+              <FileDown className="h-4 w-4" />
+              Generate Report
+            </Button>
+            <p className="text-xs text-muted-foreground">Download a detailed usage report based on current data</p>
+          </div>
+        </div>
         </div>
 
         {isUsingMock && !loading && (
@@ -368,6 +377,36 @@ export default function TrackUsage() {
           </>
         )}
       </div>
+
+      <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileDown className="h-5 w-5 text-primary" />
+              Generate Report
+            </DialogTitle>
+            <DialogDescription>
+              Create a downloadable report based on your current usage data and selected time range.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="rounded-lg border p-4 bg-secondary/30 space-y-2">
+              <p className="text-sm font-medium text-foreground">Report Summary</p>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Time range: <span className="font-medium text-foreground capitalize">{timeRange}</span></li>
+                <li>• Total usage: <span className="font-medium text-foreground">{totalUsage} L</span></li>
+                <li>• Average: <span className="font-medium text-foreground">{avgUsage} L</span></li>
+                <li>• Sensors: <span className="font-medium text-foreground">{sensors.length}</span></li>
+                <li>• Data source: <span className="font-medium text-foreground">{isUsingMock ? 'Sample data' : 'Live sensors'}</span></li>
+              </ul>
+            </div>
+            <Button className="w-full gap-2" onClick={() => setReportOpen(false)}>
+              <FileDown className="h-4 w-4" />
+              Download Report
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
