@@ -379,31 +379,118 @@ export default function TrackUsage() {
       </div>
 
       <Dialog open={reportOpen} onOpenChange={setReportOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 text-lg">
               <FileDown className="h-5 w-5 text-primary" />
-              Generate Report
+              AquaTrack Water Usage Report
             </DialogTitle>
             <DialogDescription>
-              Create a downloadable report based on your current usage data and selected time range.
+              Sensor Scope: All sensors &nbsp;·&nbsp; Date Range: Last 7 Days
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="rounded-lg border p-4 bg-secondary/30 space-y-2">
-              <p className="text-sm font-medium text-foreground">Report Summary</p>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Time range: <span className="font-medium text-foreground capitalize">{timeRange}</span></li>
-                <li>• Total usage: <span className="font-medium text-foreground">{totalUsage} L</span></li>
-                <li>• Average: <span className="font-medium text-foreground">{avgUsage} L</span></li>
-                <li>• Sensors: <span className="font-medium text-foreground">{sensors.length}</span></li>
-                <li>• Data source: <span className="font-medium text-foreground">{isUsingMock ? 'Sample data' : 'Live sensors'}</span></li>
+
+          <div className="space-y-6 py-2">
+            {/* Summary Cards */}
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-3">Summary</p>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: 'Total Usage', value: '306 L', icon: Droplets },
+                  { label: 'Avg Daily Usage', value: '18 L', icon: Activity },
+                  { label: 'Peak Usage Time', value: '9–10 PM', icon: Clock },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-lg border p-3 bg-secondary/30 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <item.icon className="h-3.5 w-3.5 text-primary" />
+                      <p className="text-xs text-muted-foreground">{item.label}</p>
+                    </div>
+                    <p className="text-lg font-bold text-foreground">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Daily Usage Table */}
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-3">Daily Usage Breakdown</p>
+              <div className="rounded-lg border overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-secondary/50">
+                      <th className="text-left p-2 font-medium text-muted-foreground">Time</th>
+                      <th className="text-right p-2 font-medium text-muted-foreground">Usage (L)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      ['6am', 8], ['7am', 10], ['8am', 12], ['9am', 14], ['10am', 15],
+                      ['11am', 16], ['12pm', 17], ['1pm', 18], ['2pm', 19], ['3pm', 20],
+                      ['4pm', 21], ['5pm', 22], ['6pm', 23], ['7pm', 24], ['8pm', 25],
+                      ['9pm', 27], ['10pm', 28],
+                    ].map(([time, usage], i) => (
+                      <tr key={i} className={i % 2 === 0 ? 'bg-card' : 'bg-secondary/20'}>
+                        <td className="p-2 text-foreground">{time}</td>
+                        <td className="p-2 text-right text-foreground font-medium">{usage} L</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Chart */}
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-3">Usage Trend</p>
+              <div className="rounded-lg border p-4 bg-card">
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={[
+                    { label: '6am', usage: 8 }, { label: '7am', usage: 10 }, { label: '8am', usage: 12 },
+                    { label: '9am', usage: 14 }, { label: '10am', usage: 15 }, { label: '11am', usage: 16 },
+                    { label: '12pm', usage: 17 }, { label: '1pm', usage: 18 }, { label: '2pm', usage: 19 },
+                    { label: '3pm', usage: 20 }, { label: '4pm', usage: 21 }, { label: '5pm', usage: 22 },
+                    { label: '6pm', usage: 23 }, { label: '7pm', usage: 24 }, { label: '8pm', usage: 25 },
+                    { label: '9pm', usage: 27 }, { label: '10pm', usage: 28 },
+                  ]}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} />
+                    <XAxis dataKey="label" tick={{ fill: CHART_LABEL_COLOR, fontSize: 10 }} />
+                    <YAxis unit=" L" tick={{ fill: CHART_LABEL_COLOR, fontSize: 10 }} />
+                    <RechartsTooltip contentStyle={tooltipStyle} />
+                    <Line type="monotone" dataKey="usage" stroke={CHART_PRIMARY} strokeWidth={2} dot={{ r: 3, fill: CHART_PRIMARY }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Insights */}
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-3">Insights</p>
+              <ul className="space-y-2">
+                {[
+                  'Usage increased by 27% compared to last week.',
+                  'Peak usage occurs in evening hours.',
+                  'Consumption rises steadily throughout the day.',
+                ].map((insight, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-foreground">
+                    <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                      <Lightbulb className="h-3 w-3 text-primary" />
+                    </div>
+                    {insight}
+                  </li>
+                ))}
               </ul>
             </div>
-            <Button className="w-full gap-2" onClick={() => setReportOpen(false)}>
-              <FileDown className="h-4 w-4" />
-              Download Report
-            </Button>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-2">
+              <Button className="flex-1 gap-2">
+                <FileDown className="h-4 w-4" />
+                Download PDF
+              </Button>
+              <Button variant="outline" className="flex-1" onClick={() => setReportOpen(false)}>
+                Close
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
