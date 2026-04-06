@@ -19,6 +19,8 @@ import SensorDetails from "./pages/SensorDetails";
 import Alerts from "./pages/Alerts";
 import Admin from "./pages/Admin";
 import TrackUsage from "./pages/TrackUsage";
+import ReduceWaste from "./pages/ReduceWaste";
+import StaySustainable from "./pages/StaySustainable";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +47,8 @@ const App = () => (
             <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
             <Route path="/track-usage" element={<ProtectedRoute><TrackUsage /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
+            <Route path="/reduce-waste" element={<ReduceWaste />} />
+            <Route path="/stay-sustainable" element={<StaySustainable />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
