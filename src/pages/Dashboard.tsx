@@ -3,15 +3,18 @@ import { AppLayout } from '@/components/AppLayout';
 import WaterAnalyticsBackground from '@/components/WaterAnalyticsBackground';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSensors } from '@/hooks/useSensors';
 import { useRoomGroups } from '@/hooks/useRoomGroups';
-import { Droplets, TrendingUp, BarChart3, Wifi, Home } from 'lucide-react';
+import { useOfflineSync } from '@/hooks/useOfflineSync';
+import { Droplets, TrendingUp, BarChart3, Wifi, Home, WifiOff } from 'lucide-react';
 
 export default function Dashboard() {
   const { profile } = useAuth();
   const { sensors, isLoading } = useSensors();
   const { groups, isLoading: groupsLoading } = useRoomGroups();
+  const { isOffline } = useOfflineSync();
   const navigate = useNavigate();
 
   const totalUsage = sensors.reduce((sum, s) => sum + s.today_usage, 0);
@@ -26,6 +29,14 @@ export default function Dashboard() {
             Welcome back, {profile?.username}! 👋
           </h1>
           <p className="text-muted-foreground mt-1">Here's an overview of your water system</p>
+          {isOffline && (
+            <Alert className="mt-3 border-yellow-500/30 bg-yellow-500/5">
+              <WifiOff className="h-4 w-4 text-yellow-600" />
+              <AlertDescription className="text-sm text-yellow-700">
+                <strong>Offline Mode Active</strong> — Sensors continue collecting data locally. Data will sync when connection is restored.
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
 
         {isLoading ? (
