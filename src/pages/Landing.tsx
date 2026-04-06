@@ -1,9 +1,10 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Droplets, TrendingDown, BarChart3, Leaf, ExternalLink } from 'lucide-react';
 import WaterBackground from '@/components/WaterBackground';
 
 export default function Landing() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen relative">
       <WaterBackground />
@@ -74,7 +75,10 @@ export default function Landing() {
 
         {/* Benefits Section */}
         <div className="grid md:grid-cols-3 gap-6 mt-20 max-w-4xl mx-auto">
-          <div className="bg-card rounded-lg p-6 text-center shadow-sm border hover-lift transition-all duration-300 hover:border-primary/20">
+          <div
+            onClick={() => navigate('/track-usage')}
+            className="bg-card rounded-lg p-6 text-center shadow-sm border hover-lift transition-all duration-300 hover:border-primary/20 cursor-pointer hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02]"
+          >
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-secondary mb-4">
               <BarChart3 className="h-6 w-6 text-primary" />
             </div>
@@ -84,7 +88,10 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="bg-card rounded-lg p-6 text-center shadow-sm border hover-lift transition-all duration-300 hover:border-primary/20">
+          <div
+            onClick={() => navigate('/reduce-waste')}
+            className="bg-card rounded-lg p-6 text-center shadow-sm border hover-lift transition-all duration-300 hover:border-primary/20 cursor-pointer hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02]"
+          >
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-secondary mb-4">
               <TrendingDown className="h-6 w-6 text-primary" />
             </div>
@@ -94,7 +101,10 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="bg-card rounded-lg p-6 text-center shadow-sm border hover-lift transition-all duration-300 hover:border-primary/20">
+          <div
+            onClick={() => navigate('/stay-sustainable')}
+            className="bg-card rounded-lg p-6 text-center shadow-sm border hover-lift transition-all duration-300 hover:border-primary/20 cursor-pointer hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02]"
+          >
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-secondary mb-4">
               <Leaf className="h-6 w-6 text-primary" />
             </div>
