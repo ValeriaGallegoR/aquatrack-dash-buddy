@@ -3,7 +3,6 @@ import { AppLayout } from '@/components/AppLayout';
 import WaterAnalyticsBackground from '@/components/WaterAnalyticsBackground';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSensors } from '@/hooks/useSensors';
 import { useRoomGroups } from '@/hooks/useRoomGroups';
@@ -13,7 +12,7 @@ import { Droplets, TrendingUp, BarChart3, Wifi, Home, WifiOff } from 'lucide-rea
 export default function Dashboard() {
   const { profile } = useAuth();
   const { sensors, isLoading } = useSensors();
-  const { groups, isLoading: groupsLoading } = useRoomGroups();
+  const { groups } = useRoomGroups();
   const { isOffline } = useOfflineSync();
   const navigate = useNavigate();
 
@@ -23,19 +22,24 @@ export default function Dashboard() {
   return (
     <AppLayout>
       <WaterAnalyticsBackground />
-      <div className="container py-8 relative">
+      <div className={`container py-8 relative transition-opacity duration-500 ${isOffline ? 'opacity-75' : ''}`}>
+        {/* Offline floating banner */}
+        {isOffline && (
+          <div className="fixed top-4 right-4 z-50 flex items-center gap-2 rounded-full bg-destructive/90 text-destructive-foreground px-4 py-2 shadow-lg animate-pulse">
+            <WifiOff className="h-4 w-4" />
+            <span className="text-sm font-medium">Offline Mode</span>
+          </div>
+        )}
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">
             Welcome back, {profile?.username}! 👋
           </h1>
           <p className="text-muted-foreground mt-1">Here's an overview of your water system</p>
           {isOffline && (
-            <Alert className="mt-3 border-destructive/30 bg-destructive/5">
-              <WifiOff className="h-4 w-4 text-destructive" />
-              <AlertDescription className="text-sm">
-                <strong>Offline Mode Active</strong> — Sensors continue collecting data locally. Data will sync when connection is restored.
-              </AlertDescription>
-            </Alert>
+            <p className="text-xs text-muted-foreground mt-2 italic">
+              You are viewing cached data. Some updates may not be real-time.
+            </p>
           )}
         </div>
 
@@ -102,9 +106,8 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Room Groups Overview */}
             {groups.length > 0 && (
-              <Card className="bg-card shadow-sm">
+              <Card className="bg-card shadow-sm mt-6">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2"><Home className="h-5 w-5 text-primary" /> Room Groups</CardTitle>
                 </CardHeader>
