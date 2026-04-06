@@ -30,9 +30,9 @@ export default function Dashboard() {
           </h1>
           <p className="text-muted-foreground mt-1">Here's an overview of your water system</p>
           {isOffline && (
-            <Alert className="mt-3 border-yellow-500/30 bg-yellow-500/5">
-              <WifiOff className="h-4 w-4 text-yellow-600" />
-              <AlertDescription className="text-sm text-yellow-700">
+            <Alert className="mt-3 border-destructive/30 bg-destructive/5">
+              <WifiOff className="h-4 w-4 text-destructive" />
+              <AlertDescription className="text-sm">
                 <strong>Offline Mode Active</strong> — Sensors continue collecting data locally. Data will sync when connection is restored.
               </AlertDescription>
             </Alert>
