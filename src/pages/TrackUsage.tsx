@@ -123,7 +123,7 @@ export default function TrackUsage() {
     <AppLayout>
       <WaterAnalyticsBackground />
       <div className="relative container py-8 space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
@@ -141,15 +141,19 @@ export default function TrackUsage() {
                   <p>View your water usage data across daily, weekly, and monthly timeframes. Connect sensors to see real data instead of samples.</p>
                 </TooltipContent>
               </Tooltip>
+            </div>
           </div>
-          <div className="flex flex-col items-end gap-1">
-            <Button onClick={() => setReportOpen(true)} className="gap-2">
-              <FileDown className="h-4 w-4" />
-              Generate Report
-            </Button>
-            <p className="text-xs text-muted-foreground">Download a detailed usage report based on current data</p>
-          </div>
-        </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={() => setReportOpen(true)} className="gap-2 px-5 py-2.5">
+                <FileDown className="h-4 w-4" />
+                Generate Report
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Download a detailed usage report based on current data</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
 
         {isUsingMock && !loading && (
