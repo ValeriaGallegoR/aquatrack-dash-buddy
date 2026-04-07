@@ -45,7 +45,7 @@ const App = () => (
             <Route path="/sensors" element={<ProtectedRoute><Sensors /></ProtectedRoute>} />
             <Route path="/sensors/:sensorId" element={<ProtectedRoute><SensorDetails /></ProtectedRoute>} />
             <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
-            <Route path="/track-usage" element={<ProtectedRoute><TrackUsage /></ProtectedRoute>} />
+            <Route path="/track-usage" element={<TrackUsage />} />
             <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
             <Route path="/reduce-waste" element={<ReduceWaste />} />
             <Route path="/stay-sustainable" element={<StaySustainable />} />
