@@ -15,6 +15,7 @@ const userNavItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Sensors', url: '/sensors', icon: Radio },
   { title: 'Alerts', url: '/alerts', icon: Bell },
+  { title: 'Track Usage', url: '/track-usage', icon: BarChart3 },
 ];
 
 const adminNavItems = [
