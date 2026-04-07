@@ -13,6 +13,7 @@ export default function Home() {
   const navigate = useNavigate();
   const { sensors } = useSensors();
   const { alerts } = useAlerts();
+  const { groups } = useRoomGroups();
 
   // Redirect admin to admin dashboard
   useEffect(() => {
@@ -76,6 +77,36 @@ export default function Home() {
             </Card>
           </div>
         </div>
+
+        {groups.length > 0 && (
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Room Groups</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {groups.map((g) => {
+                const groupSensors = sensors.filter((s) => s.room_group_id === g.id);
+                const groupUsage = groupSensors.reduce((sum, s) => sum + s.today_usage, 0);
+                return (
+                  <Card
+                    key={g.id}
+                    onClick={() => navigate(`/room-groups/${g.id}`)}
+                    className="cursor-pointer border border-border hover:border-primary/40 hover:shadow-md transition-all group"
+                  >
+                    <CardContent className="p-5">
+                      <div className="flex items-center gap-2 mb-2">
+                        <HomeIcon className="h-4 w-4 text-primary" />
+                        <p className="font-medium text-foreground text-sm">{g.name}</p>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{groupSensors.length} sensor{groupSensors.length !== 1 ? 's' : ''}</span>
+                        <span className="font-semibold text-foreground">{groupUsage} L</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </AppLayout>
   );
