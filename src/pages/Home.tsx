@@ -4,8 +4,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSensors } from '@/hooks/useSensors';
 import { useAlerts } from '@/hooks/useAlerts';
-import { Droplets, LayoutDashboard, Radio, Bell, Wifi } from 'lucide-react';
+import { Droplets, LayoutDashboard, Radio, Bell, Wifi, Home as HomeIcon } from 'lucide-react';
 import { useEffect } from 'react';
+import { useRoomGroups } from '@/hooks/useRoomGroups';
 
 export default function Home() {
   const { profile, isAdmin } = useAuth();

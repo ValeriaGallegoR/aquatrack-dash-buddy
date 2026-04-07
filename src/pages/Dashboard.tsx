@@ -117,7 +117,11 @@ export default function Dashboard() {
                       const groupSensors = sensors.filter((s) => (s as any).room_group_id === g.id);
                       const groupUsage = groupSensors.reduce((sum, s) => sum + s.today_usage, 0);
                       return (
-                        <div key={g.id} className="rounded-lg border p-3 bg-secondary/30">
+                        <div
+                          key={g.id}
+                          onClick={() => navigate(`/room-groups/${g.id}`)}
+                          className="cursor-pointer rounded-lg border p-3 bg-secondary/30 hover:border-primary/40 hover:shadow-md transition-all"
+                        >
                           <div className="flex items-center gap-2 mb-2">
                             <Home className="h-4 w-4 text-primary" />
                             <p className="font-medium text-foreground text-sm">{g.name}</p>

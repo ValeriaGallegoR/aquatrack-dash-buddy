@@ -21,6 +21,7 @@ import Admin from "./pages/Admin";
 import TrackUsage from "./pages/TrackUsage";
 import ReduceWaste from "./pages/ReduceWaste";
 import StaySustainable from "./pages/StaySustainable";
+import RoomGroupDetails from "./pages/RoomGroupDetails";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
