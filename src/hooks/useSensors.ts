@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { useOfflineCache } from './useOfflineCache';
 
 export interface Sensor {
   id: string;
@@ -16,19 +17,42 @@ export interface Sensor {
   room_group_id: string | null;
 }
 
+const CACHE_KEY = 'sensors';
+
 export function useSensors() {
   const { user } = useAuth();
   const [sensors, setSensors] = useState<Sensor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { cacheData, getCachedData } = useOfflineCache();
 
   const fetchSensors = useCallback(async () => {
     if (!user) { setSensors([]); setIsLoading(false); return; }
     setIsLoading(true);
+
+    if (!navigator.onLine) {
+      const cached = getCachedData<Sensor[]>(CACHE_KEY);
+      if (cached) setSensors(cached);
+      setIsLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase.from('sensors').select('*').order('sensor_code', { ascending: true });
-    if (error) { toast.error('Failed to load sensors.'); console.error(error); }
-    else setSensors((data ?? []) as Sensor[]);
+    if (error) {
+      console.error(error);
+      // Fallback to cache on error
+      const cached = getCachedData<Sensor[]>(CACHE_KEY);
+      if (cached) {
+        setSensors(cached);
+      } else {
+        toast.error('Failed to load sensors.');
+      }
+    } else {
+      const result = (data ?? []) as Sensor[];
+      setSensors(result);
+      cacheData(CACHE_KEY, result);
+    }
     setIsLoading(false);
-  }, [user]);
+  }, [user, cacheData, getCachedData]);
 
   useEffect(() => { fetchSensors(); }, [fetchSensors]);
 
@@ -45,15 +69,23 @@ export function useSensors() {
     }).select().single();
 
     if (error) { toast.error('Failed to add sensor.'); console.error(error); return null; }
-    setSensors((prev) => [...prev, data as Sensor]);
-    return data as Sensor;
+    const newSensor = data as Sensor;
+    setSensors((prev) => {
+      const updated = [...prev, newSensor];
+      cacheData(CACHE_KEY, updated);
+      return updated;
+    });
+    return newSensor;
   };
-
 
   const removeSensor = async (id: string) => {
     const { error } = await supabase.from('sensors').delete().eq('id', id);
     if (error) { toast.error('Failed to remove sensor.'); console.error(error); return false; }
-    setSensors((prev) => prev.filter((s) => s.id !== id));
+    setSensors((prev) => {
+      const updated = prev.filter((s) => s.id !== id);
+      cacheData(CACHE_KEY, updated);
+      return updated;
+    });
     return true;
   };
 
@@ -61,7 +93,11 @@ export function useSensors() {
     const { data, error } = await supabase.from('sensors').update(updates).eq('id', id).select().single();
     if (error) { toast.error('Failed to update sensor.'); console.error(error); return null; }
     const updated = data as Sensor;
-    setSensors((prev) => prev.map((s) => s.id === id ? updated : s));
+    setSensors((prev) => {
+      const result = prev.map((s) => s.id === id ? updated : s);
+      cacheData(CACHE_KEY, result);
+      return result;
+    });
     return updated;
   };
 

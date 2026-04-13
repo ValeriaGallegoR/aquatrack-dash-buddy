@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { useOfflineCache } from './useOfflineCache';
 
 export interface RoomGroup {
   id: string;
@@ -10,22 +11,41 @@ export interface RoomGroup {
   created_at: string;
 }
 
+const CACHE_KEY = 'room_groups';
+
 export function useRoomGroups() {
   const { user } = useAuth();
   const [groups, setGroups] = useState<RoomGroup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { cacheData, getCachedData } = useOfflineCache();
 
   const fetchGroups = useCallback(async () => {
     if (!user) { setGroups([]); setIsLoading(false); return; }
     setIsLoading(true);
+
+    if (!navigator.onLine) {
+      const cached = getCachedData<RoomGroup[]>(CACHE_KEY);
+      if (cached) setGroups(cached);
+      setIsLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase
       .from('room_groups')
       .select('*')
       .order('created_at', { ascending: true });
-    if (error) { toast.error('Failed to load room groups.'); console.error(error); }
-    else setGroups((data ?? []) as RoomGroup[]);
+    if (error) {
+      console.error(error);
+      const cached = getCachedData<RoomGroup[]>(CACHE_KEY);
+      if (cached) setGroups(cached);
+      else toast.error('Failed to load room groups.');
+    } else {
+      const result = (data ?? []) as RoomGroup[];
+      setGroups(result);
+      cacheData(CACHE_KEY, result);
+    }
     setIsLoading(false);
-  }, [user]);
+  }, [user, cacheData, getCachedData]);
 
   useEffect(() => { fetchGroups(); }, [fetchGroups]);
 
@@ -44,7 +64,11 @@ export function useRoomGroups() {
       .single();
     if (error) { toast.error('Failed to create group.'); console.error(error); return null; }
     const group = data as RoomGroup;
-    setGroups((prev) => [...prev, group]);
+    setGroups((prev) => {
+      const updated = [...prev, group];
+      cacheData(CACHE_KEY, updated);
+      return updated;
+    });
     return group;
   };
 
@@ -60,14 +84,22 @@ export function useRoomGroups() {
       .update({ name: trimmed })
       .eq('id', id);
     if (error) { toast.error('Failed to rename group.'); console.error(error); return false; }
-    setGroups((prev) => prev.map((g) => g.id === id ? { ...g, name: trimmed } : g));
+    setGroups((prev) => {
+      const updated = prev.map((g) => g.id === id ? { ...g, name: trimmed } : g);
+      cacheData(CACHE_KEY, updated);
+      return updated;
+    });
     return true;
   };
 
   const deleteGroup = async (id: string) => {
     const { error } = await supabase.from('room_groups').delete().eq('id', id);
     if (error) { toast.error('Failed to delete group.'); console.error(error); return false; }
-    setGroups((prev) => prev.filter((g) => g.id !== id));
+    setGroups((prev) => {
+      const updated = prev.filter((g) => g.id !== id);
+      cacheData(CACHE_KEY, updated);
+      return updated;
+    });
     return true;
   };
 

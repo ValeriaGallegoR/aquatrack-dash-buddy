@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { toast } from 'sonner';
 
 const CACHE_KEY = 'aquatrack_offline_readings';
 
@@ -20,9 +19,6 @@ export function useOfflineSync() {
     };
     const goOnline = () => {
       setIsOffline(false);
-      if (wasOffline.current) {
-        toast.success('Back Online — syncing data…', { duration: 4000 });
-      }
     };
     window.addEventListener('offline', goOffline);
     window.addEventListener('online', goOnline);
@@ -68,11 +64,7 @@ export function useOfflineSync() {
   // Auto-sync when coming back online
   useEffect(() => {
     if (!isOffline) {
-      syncCachedReadings().then((result) => {
-        if (result.synced > 0) {
-          toast.success(`Synced ${result.synced} cached readings`);
-        }
-      });
+      syncCachedReadings();
     }
   }, [isOffline, syncCachedReadings]);
 
