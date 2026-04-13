@@ -6,14 +6,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSensors } from '@/hooks/useSensors';
 import { useRoomGroups } from '@/hooks/useRoomGroups';
-import { useOfflineSync } from '@/hooks/useOfflineSync';
-import { Droplets, TrendingUp, BarChart3, Wifi, Home, WifiOff } from 'lucide-react';
+import { Droplets, TrendingUp, BarChart3, Wifi, Home } from 'lucide-react';
 
 export default function Dashboard() {
   const { profile } = useAuth();
   const { sensors, isLoading } = useSensors();
   const { groups } = useRoomGroups();
-  const { isOffline } = useOfflineSync();
   const navigate = useNavigate();
 
   const totalUsage = sensors.reduce((sum, s) => sum + s.today_usage, 0);
@@ -22,25 +20,12 @@ export default function Dashboard() {
   return (
     <AppLayout>
       <WaterAnalyticsBackground />
-      <div className={`container py-8 relative transition-opacity duration-500 ${isOffline ? 'opacity-75' : ''}`}>
-        {/* Offline floating banner */}
-        {isOffline && (
-          <div className="fixed top-4 right-4 z-50 flex items-center gap-2 rounded-full bg-destructive/90 text-destructive-foreground px-4 py-2 shadow-lg animate-pulse">
-            <WifiOff className="h-4 w-4" />
-            <span className="text-sm font-medium">Offline Mode</span>
-          </div>
-        )}
-
+      <div className="container py-8 relative">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">
             Welcome back, {profile?.username}! 👋
           </h1>
           <p className="text-muted-foreground mt-1">Here's an overview of your water system</p>
-          {isOffline && (
-            <p className="text-xs text-muted-foreground mt-2 italic">
-              You are viewing cached data. Some updates may not be real-time.
-            </p>
-          )}
         </div>
 
         {isLoading ? (
