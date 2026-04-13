@@ -13,6 +13,7 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as
 import { useSensors } from '@/hooks/useSensors';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useOfflineCache } from '@/hooks/useOfflineCache';
 import { Droplets, TrendingUp, BarChart3, Activity, Info, HelpCircle, Clock, ArrowUpRight, Sun, Lightbulb, FileDown } from 'lucide-react';
 
 type TimeRange = 'daily' | 'weekly' | 'monthly';
@@ -43,6 +44,7 @@ export default function TrackUsage() {
   const [readings, setReadings] = useState<any[]>([]);
   const [readingsLoading, setReadingsLoading] = useState(true);
   const [reportOpen, setReportOpen] = useState(false);
+  const { cacheData, getCachedData } = useOfflineCache();
 
   const hasSensors = sensors.length > 0;
 
@@ -50,17 +52,31 @@ export default function TrackUsage() {
     async function fetchReadings() {
       if (!user || !hasSensors) { setReadingsLoading(false); return; }
       setReadingsLoading(true);
+
+      if (!navigator.onLine) {
+        const cached = getCachedData<any[]>('readings');
+        if (cached) setReadings(cached);
+        setReadingsLoading(false);
+        return;
+      }
+
       const sensorIds = sensors.map((s) => s.id);
       const { data, error } = await supabase
         .from('sensor_readings')
         .select('*')
         .in('sensor_id', sensorIds)
         .order('recorded_at', { ascending: true });
-      if (!error && data) setReadings(data);
+      if (!error && data) {
+        setReadings(data);
+        cacheData('readings', data);
+      } else {
+        const cached = getCachedData<any[]>('readings');
+        if (cached) setReadings(cached);
+      }
       setReadingsLoading(false);
     }
     if (!sensorsLoading) fetchReadings();
-  }, [user, sensors, sensorsLoading, hasSensors]);
+  }, [user, sensors, sensorsLoading, hasSensors, cacheData, getCachedData]);
 
   const realData = useMemo(() => {
     if (!hasSensors || readings.length === 0) return null;
