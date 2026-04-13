@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/AppLayout';
 import WaterAnalyticsBackground from '@/components/WaterAnalyticsBackground';
@@ -6,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSensors } from '@/hooks/useSensors';
 import { useRoomGroups } from '@/hooks/useRoomGroups';
+import { useTodayUsage } from '@/hooks/useTodayUsage';
 import { Droplets, TrendingUp, BarChart3, Wifi, Home } from 'lucide-react';
 
 export default function Dashboard() {
@@ -14,8 +16,11 @@ export default function Dashboard() {
   const { groups } = useRoomGroups();
   const navigate = useNavigate();
 
-  const totalUsage = sensors.reduce((sum, s) => sum + s.today_usage, 0);
+  const sensorIds = useMemo(() => sensors.map((s) => s.id), [sensors]);
+  const { totalUsage, getTodayUsage, isLoading: usageLoading } = useTodayUsage(sensorIds);
+
   const connectedCount = sensors.filter((s) => s.status === 'connected').length;
+  const loading = isLoading || usageLoading;
 
   return (
     <AppLayout>
@@ -28,7 +33,7 @@ export default function Dashboard() {
           <p className="text-muted-foreground mt-1">Here's an overview of your water system</p>
         </div>
 
-        {isLoading ? (
+        {loading ? (
           <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3].map((i) => <Skeleton key={i} className="h-28 rounded-xl" />)}
@@ -43,7 +48,7 @@ export default function Dashboard() {
                   <CardTitle className="text-sm font-medium">Total Usage Today</CardTitle>
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/12"><Droplets className="h-4 w-4 text-primary" /></div>
                 </CardHeader>
-                <CardContent><div className="text-2xl font-bold">{totalUsage} L</div><p className="text-xs text-muted-foreground">Across all sensors</p></CardContent>
+                <CardContent><div className="text-2xl font-bold">{Math.round(totalUsage)} L</div><p className="text-xs text-muted-foreground">Across all sensors</p></CardContent>
               </Card>
               <Card className="hover-glow bg-card shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -70,22 +75,25 @@ export default function Dashboard() {
                   <p className="text-muted-foreground text-sm">No sensors added yet. Add sensors to see usage data here.</p>
                 ) : (
                   <div className="space-y-3">
-                    {sensors.map((s) => (
-                      <div
-                        key={s.id}
-                        onClick={() => navigate(`/sensors/${s.sensor_code}`)}
-                        className="flex items-center justify-between rounded-lg border p-3 card-3d bg-card"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/12"><Droplets className="h-4 w-4 text-primary" /></div>
-                          <div>
-                            <p className="font-medium text-foreground text-sm">{s.sensor_name}</p>
-                            <p className="text-xs text-muted-foreground">{s.location} · {s.sensor_code}</p>
+                    {sensors.map((s) => {
+                      const usage = getTodayUsage(s.id);
+                      return (
+                        <div
+                          key={s.id}
+                          onClick={() => navigate(`/sensors/${s.sensor_code}`)}
+                          className="flex items-center justify-between rounded-lg border p-3 card-3d bg-card"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/12"><Droplets className="h-4 w-4 text-primary" /></div>
+                            <div>
+                              <p className="font-medium text-foreground text-sm">{s.sensor_name}</p>
+                              <p className="text-xs text-muted-foreground">{s.location} · {s.sensor_code}</p>
+                            </div>
                           </div>
+                          <span className="font-semibold text-foreground">{Math.round(usage)} L</span>
                         </div>
-                        <span className="font-semibold text-foreground">{s.today_usage} L</span>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
@@ -100,7 +108,7 @@ export default function Dashboard() {
                   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {groups.map((g) => {
                       const groupSensors = sensors.filter((s) => (s as any).room_group_id === g.id);
-                      const groupUsage = groupSensors.reduce((sum, s) => sum + s.today_usage, 0);
+                      const groupUsage = groupSensors.reduce((sum, s) => sum + getTodayUsage(s.id), 0);
                       return (
                         <div
                           key={g.id}
@@ -113,7 +121,7 @@ export default function Dashboard() {
                           </div>
                           <div className="flex items-center justify-between text-xs text-muted-foreground">
                             <span>{groupSensors.length} sensor{groupSensors.length !== 1 ? 's' : ''}</span>
-                            <span className="font-semibold text-foreground">{groupUsage} L</span>
+                            <span className="font-semibold text-foreground">{Math.round(groupUsage)} L</span>
                           </div>
                         </div>
                       );
